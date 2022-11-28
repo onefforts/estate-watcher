@@ -51,6 +51,7 @@ btn3.addEventListener("click", async () => {
   new_property_array = await window.versions.puppeteer();
   console.log(new_property_array);
   if (before_property_array !== undefined) {
+    if(before_property_array !== null){
     console.log("nullじゃない");
     console.log(before_property_array.length);
     console.log(new_property_array.length);
@@ -71,7 +72,7 @@ btn3.addEventListener("click", async () => {
   console.log(new_property_array);
   for (i = 0; i < new_property_array.length; i++) {
     makeBuildingLi(new_property_array);
-  }
+  }}
 });
 function makeBuildingLi(property_array) {
   let str = `<div style ="border: 1px solid #ddd; border-bottom: none;">
