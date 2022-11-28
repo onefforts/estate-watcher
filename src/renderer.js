@@ -75,7 +75,6 @@ btn3.addEventListener("click", async () => {
 });
 function makeBuildingLi(property_array) {
   let str = `<div style ="border: 1px solid #ddd; border-bottom: none;">
-  <button class ="watched" onclick="setFlag(${i})">見たボタン</button>
   <h2 style="border-bottom: 1px solid #ddd;
   padding: 9px 10px 7px;
   background: #F6F5E7;
@@ -87,6 +86,7 @@ function makeBuildingLi(property_array) {
     font-size: 1em;">
     <a href='${property_array[i].link}' target="_blank">
         ${property_array[i].address}</a>
+    <button class ="watched" onclick="setFlag(${i})">見たボタン</button>
     </p>
   </h2>
   <div class="itemBody">
