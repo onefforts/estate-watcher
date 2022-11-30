@@ -21,10 +21,13 @@ const func = async () => {
 };
 function setFlag(i) {
   Number(i);
-  //const property_array = localStorage.key; //jsonにする
+  new_property_array[i].flag = true;
+  console.log(new_property_array[i].flag);
+}
+function unsetFlag(i) {
+  Number(i);
   new_property_array[i].flag = false;
   console.log(new_property_array[i].flag);
-  //localStorage.key = new_property_array;
 }
 const watchfilterbtn = document.getElementById("watchfilter");
 const allshowbtn = document.getElementById("allshow");
@@ -46,25 +49,27 @@ allshowbtn.addEventListener("click", async () => {
   }
 });
 btn3.addEventListener("click", async () => {
-  console.log("AUTOボタンが押されました");
+  console.log("更新ボタンが押されました");
   getdiv.innerHTML = "";
   new_property_array = await window.versions.puppeteer();
   console.log(new_property_array);
   if (before_property_array !== undefined) {
-    console.log("nullじゃない");
-    console.log(before_property_array.length);
-    console.log(new_property_array.length);
-    console.log(new_property_array);
-    console.log(before_property_array);
-    for (i = 0; i < before_property_array.length; i++) {
-      checkflag = true;
-      for (j = 0; j < new_property_array.length; j++) {
-        if (before_property_array[i].address == new_property_array[j].address)
-          checkflag = false;
-      }
-      if (checkflag) {
-        new_property_array.push(before_property_array[i]);
-        console.log("============");
+    if (before_property_array !== null) {
+      console.log("nullじゃない");
+      console.log(before_property_array.length);
+      console.log(new_property_array.length);
+      console.log(new_property_array);
+      console.log(before_property_array);
+      for (i = 0; i < before_property_array.length; i++) {
+        checkflag = true;
+        for (j = 0; j < new_property_array.length; j++) {
+          if (before_property_array[i].address == new_property_array[j].address)
+            checkflag = false;
+        }
+        if (checkflag) {
+          new_property_array.push(before_property_array[i]);
+          console.log("============");
+        }
       }
     }
   }
@@ -86,7 +91,8 @@ function makeBuildingLi(property_array) {
     font-size: 1em;">
     <a href='${property_array[i].link}' target="_blank">
         ${property_array[i].address}</a>
-    <button class ="watched" onclick="setFlag(${i})">見たボタン</button>
+    <button class ="watched" onclick="setFlag(${i})">チェック</button>
+    <button class ="unwatched" onclick="unsetFlag(${i})">未チェック</button>
     </p>
   </h2>
   <div class="itemBody">

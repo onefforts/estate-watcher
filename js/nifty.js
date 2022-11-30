@@ -26,7 +26,7 @@ exports.nifty = async function nifty(page) {
       site: "",
       build_area: "",
       build_date: "",
-      flag: "true",
+      flag: "false",
     };
     hatoarray.build_src = await getBuildSrc();
     hatoarray.link = await getLink(page);

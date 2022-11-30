@@ -11,7 +11,7 @@ if (require("electron-squirrel-startup")) {
 }
 async function AutomationPuppeteer() {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ["--no-sandbox", "defaultViewport: null"],
   });
   const page = await browser.newPage();
@@ -51,7 +51,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1920,
-    height: 108,
+    height: 1080,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), //(実行中のスクリプトパス,レンダリング前にバージョン公開)非同期でスクリプトをロード
     },
@@ -61,6 +61,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   //mainWindowにindex.html読み込み
   mainWindow.webContents.openDevTools(); //Developerツールを開いてサイトを開く
+  //mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
 };
 
 app.whenReady().then(() => {
