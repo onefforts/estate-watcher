@@ -59,16 +59,13 @@ allshowbtn.addEventListener("click", async () => {
 });
 btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
+  btn3.classList.add("pushbtn");
   new_property_array = await window.versions.puppeteer();
   getdiv.innerHTML = "";
   console.log(new_property_array);
   if (before_property_array !== undefined) {
     if (before_property_array !== null) {
-      console.log("nullじゃない");
-      console.log(before_property_array.length);
-      console.log(new_property_array.length);
-      console.log(new_property_array);
-      console.log(before_property_array);
+      console.log("localstorageがあります。");
       for (i = 0; i < before_property_array.length; i++) {
         checkflag = true;
         for (j = 0; j < new_property_array.length; j++) {
@@ -77,7 +74,7 @@ btn3.addEventListener("click", async () => {
         }
         if (checkflag) {
           new_property_array.push(before_property_array[i]);
-          console.log("============");
+          console.log("新しい物件が追加されました");
         }
       }
     }
@@ -86,6 +83,7 @@ btn3.addEventListener("click", async () => {
   for (i = 0; i < new_property_array.length; i++) {
     makeBuildingLi(new_property_array);
   }
+  btn3.classList.remove("pushbtn");
 });
 function makeBuildingLi(property_array) {
   let checkclass;

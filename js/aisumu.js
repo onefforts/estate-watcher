@@ -22,7 +22,7 @@ exports.aisumu = async function aisumu(page) {
       site: "",
       build_area: "",
       build_date: "",
-      flag: "false",
+      flag: false,
     };
     hatoarray.build_src = await getBuildSrc();
     hatoarray.link = await getLink(page);

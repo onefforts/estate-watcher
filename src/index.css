@@ -22,3 +22,6 @@ h2.checked{
   flex-wrap:wrap; /* 折り返し */
   justify-content:space-between; /* 子要素を均等に配置・両端揃え */
 }
+.pushbtn{
+  background: #ffa500;
+}
