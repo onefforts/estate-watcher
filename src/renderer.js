@@ -19,15 +19,24 @@ const func = async () => {
   const response = await window.versions.ping();
   console.log(response); // 'pong' と出力
 };
-function setFlag(i) {
-  Number(i);
-  new_property_array[i].flag = true;
-  console.log(new_property_array[i].flag);
+function setFlag(j) {
+  //元々falseでチェックでtrue
+  Number(j);
+  new_property_array[j].flag = true;
+  console.log(new_property_array[j].flag);
+  getdiv.innerHTML = "";
+  for (i = 0; i < new_property_array.length; i++) {
+    makeBuildingLi(new_property_array);
+  }
 }
-function unsetFlag(i) {
-  Number(i);
-  new_property_array[i].flag = false;
-  console.log(new_property_array[i].flag);
+function unsetFlag(j) {
+  Number(j);
+  new_property_array[j].flag = false;
+  console.log(new_property_array[j].flag);
+  getdiv.innerHTML = "";
+  for (i = 0; i < new_property_array.length; i++) {
+    makeBuildingLi(new_property_array);
+  }
 }
 const watchfilterbtn = document.getElementById("watchfilter");
 const allshowbtn = document.getElementById("allshow");
@@ -79,13 +88,12 @@ btn3.addEventListener("click", async () => {
   }
 });
 function makeBuildingLi(property_array) {
+  let checkclass;
+  if (property_array[i].flag) checkclass = "checked";
+  else checkclass = "unchecked";
+
   let str = `<div style ="border: 1px solid #ddd; border-bottom: none;">
-  <h2 style="border-bottom: 1px solid #ddd;
-  padding: 9px 10px 7px;
-  background: #F6F5E7;
-  text-decoration: none;
-  color: #333;
-  font-size: 16px;">
+  <h2 class = ${checkclass}>
     <p style="margin: 0;
     padding: 0;
     font-size: 1em;">
@@ -154,5 +162,3 @@ function makeBuildingLi(property_array) {
 }
 
 func();
-//ボタンつける
-//jsonに直したり
