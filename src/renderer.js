@@ -2,6 +2,7 @@ let new_property_array;
 let before_property_array;
 let checkflag;
 let getdiv = document.getElementById("div");
+let div;
 window.onbeforeunload = function () {
   localStorage.clear();
   localStorage.setItem("key", JSON.stringify(new_property_array));
@@ -44,7 +45,6 @@ const btn3 = document.getElementById("btn3");
 watchfilterbtn.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   for (i = 0; i < new_property_array.length; i++) {
-    console.log(new_property_array[i].flag);
     if (new_property_array[i].flag) {
       makeBuildingLi(new_property_array);
     }
@@ -92,7 +92,7 @@ function makeBuildingLi(property_array) {
   if (property_array[i].flag) checkclass = "checked";
   else checkclass = "unchecked";
 
-  let str = `<div style ="border: 1px solid #ddd; border-bottom: none;">
+  let str = `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
   <h2 class = ${checkclass}>
     <p style="margin: 0;
     padding: 0;
@@ -108,7 +108,7 @@ function makeBuildingLi(property_array) {
     <div class="clearfix">
       <div style="float: left;
       margin-right: 9px;
-      margin-bottom: 160px;
+      margin-bottom: 230px;
       width: 227px;">
         <p class="mainImageRect">
           <a href="/chuko/ikkodate/fukushima/aizuwakamatsushi/suumof_70599242/" target="_blank" data-pbcd-track-on-click="">
@@ -156,9 +156,18 @@ function makeBuildingLi(property_array) {
       </div>
     </div>
   </div>`;
-  let div = document.createElement("div");
-  div.innerHTML = str; //html要素に変換
-  getdiv.appendChild(div); //getdivに追加
+  if (i % 2 == 0) {
+    //iが偶数の時
+    div = document.createElement("div");
+    div.classList.add("flex");
+  }
+  let div2 = document.createElement("div");
+  div2.innerHTML = str; //html要素に変換
+  div.appendChild(div2);
+  if (i % 2 == 0) {
+    //iが偶数の時
+    getdiv.appendChild(div); //getdivに追加
+  }
 }
 
 func();

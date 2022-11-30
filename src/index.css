@@ -14,3 +14,11 @@ h2.checked{
   color: #333;
   font-size: 16px
 }
+.flex{
+  width:100%;
+  height:auto;
+  display:flex;
+  flex-direction:row; /* 記載しなくてもデフォルトで指定されている */
+  flex-wrap:wrap; /* 折り返し */
+  justify-content:space-between; /* 子要素を均等に配置・両端揃え */
+}

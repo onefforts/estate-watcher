@@ -60,8 +60,7 @@ const createWindow = () => {
   //(preloadのkey"set-title"からtitle文字列取得,handleSetTitleにipcMainEvent構造体とtitleを送る)
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   //mainWindowにindex.html読み込み
-  mainWindow.webContents.openDevTools(); //Developerツールを開いてサイトを開く
-  //mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
+  mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
 };
 
 app.whenReady().then(() => {
