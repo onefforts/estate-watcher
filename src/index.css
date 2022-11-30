@@ -14,14 +14,31 @@ h2.checked{
   color: #333;
   font-size: 16px
 }
-.flex{
-  width:100%;
-  height:auto;
-  display:flex;
-  flex-direction:row; /* 記載しなくてもデフォルトで指定されている */
-  flex-wrap:wrap; /* 折り返し */
-  justify-content:space-between; /* 子要素を均等に配置・両端揃え */
-}
 .pushbtn{
   background: #ffa500;
+}
+table.row tr{
+  background: #f1f9c5;
+  font-weight: normal;
+  color: #224619;
+}
+.row {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid #333;
+  border-right: 1px solid #333;
+}
+
+.row th,
+.row td{
+  padding: 5px;
+  font-weight: normal;
+  border-left: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+.row th{
+  background-color: #CDEAFF;
+}
+.row td{
+  background-color: #fbf9f9;
 }

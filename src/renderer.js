@@ -42,6 +42,30 @@ function unsetFlag(i) {
 const watchfilterbtn = document.getElementById("watchfilter");
 const allshowbtn = document.getElementById("allshow");
 const btn3 = document.getElementById("btn3");
+const sortbtn = document.getElementById("sort");
+sortbtn.addEventListener("click", async () => {
+  for (i = 0; i < new_property_array.length; i++) {
+    for (j = new_property_array.length - 1; i < j; j--) {
+      let price1 = new_property_array[j - 1].price;
+      let price2 = new_property_array[j].price;
+      price1 = price1.replace("万円", "");
+      price2 = price2.replace("万円", "");
+      Number(price1);
+      Number(price2);
+      console.log(price1);
+      console.log(price2);
+      if (price1 > price2) {
+        let tmp = new_property_array[j - 1];
+        new_property_array[j - 1] = new_property_array[j];
+        new_property_array[j] = tmp;
+      }
+    }
+  }
+  getdiv.innerHTML = "";
+  for (i = 0; i < new_property_array.length; i++) {
+    makeBuildingLi(new_property_array);
+  }
+});
 watchfilterbtn.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   for (i = 0; i < new_property_array.length; i++) {
@@ -106,53 +130,23 @@ function makeBuildingLi(property_array) {
     <div class="clearfix">
       <div style="float: left;
       margin-right: 9px;
-      margin-bottom: 230px;
-      width: 227px;">
         <p class="mainImageRect">
           <a href="/chuko/ikkodate/fukushima/aizuwakamatsushi/suumof_70599242/" target="_blank" data-pbcd-track-on-click="">
-            <img alt=A src=${property_array[i].build_src} height="127" width="170">
+            <img alt=A src=${property_array[i].build_src} height="300" widtd="170">
           </a>
         </p>
       </div>
-      <div>
-        <dl style="width: 100%;
-        line-height: 1.5;">
-        <dt style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;">価格</dt>
-          <dd style="font-size: 1.25em;
-          font-weight: bold;
-          color: #ec5300;">${property_array[i].price}</dd>
-        <dt style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;">所在地</dt>
-          <dd>${property_array[i].address}</dd>
-        <dt style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;">交通</dt>
-          <dd>${property_array[i].traffic}</dd>
-        <dt style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;">土地面積</dt>
-          <dd style="padding-left: 195;">${property_array[i].land_area}</dd>
-        <dt style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;
-        ">建物面積</dt>
-          <dd style="padding-left: 195;">${property_array[i].build_area}</dd>
-        <dt  style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;
-        ">築年月</dt>
-          <dd style="padding-left: 195;">${property_array[i].build_date}</dd>
-        <dt  style="background: #f1f9c5;
-        font-weight: normal;
-        color: #224619;
-        ">参照サイト</dt>
-          <dd style="padding-left: 195;">${property_array[i].site}</dd>
-        </dl>
-      </div>
+        <table border="1" class="row">
+        <tr><th>価格</th><td>${property_array[i].price}</td></tr>
+        <tr><th>所在地</th><td>${property_array[i].address}</td></tr>
+        <tr><th>交通</th><td>${property_array[i].traffic}</td></tr>
+        <tr><th>土地面積</th><td>${property_array[i].land_area}</td></tr>
+        <tr><th>建物面積</th><td>${property_array[i].build_area}</td></tr>
+        <tr><th>築年月</th><td>${property_array[i].build_date}</td></tr>
+        <tr><th>参照サイト</th><td>${property_array[i].site}</td></tr>
+        </table>
     </div>
+  </div>
   </div>`;
   if (i % 2 == 0) {
     //iが偶数の時
