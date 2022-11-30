@@ -20,23 +20,23 @@ const func = async () => {
   const response = await window.versions.ping();
   console.log(response); // 'pong' と出力
 };
-function setFlag(j) {
+function setFlag(i) {
   //元々falseでチェックでtrue
-  Number(j);
-  new_property_array[j].flag = true;
-  console.log(new_property_array[j].flag);
-  getdiv.innerHTML = "";
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
+  Number(i);
+  new_property_array[i].flag = true;
+  let h2 = document.getElementById(i);
+  if (h2.classList.contains("unchecked")) {
+    h2.classList.remove("unchecked");
+    h2.classList.add("checked");
   }
 }
-function unsetFlag(j) {
-  Number(j);
-  new_property_array[j].flag = false;
-  console.log(new_property_array[j].flag);
-  getdiv.innerHTML = "";
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
+function unsetFlag(i) {
+  Number(i);
+  new_property_array[i].flag = false;
+  let h2 = document.getElementById(`${i}`);
+  if (h2.classList.contains("checked")) {
+    h2.classList.remove("checked");
+    h2.classList.add("unchecked");
   }
 }
 const watchfilterbtn = document.getElementById("watchfilter");
@@ -59,8 +59,8 @@ allshowbtn.addEventListener("click", async () => {
 });
 btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
-  getdiv.innerHTML = "";
   new_property_array = await window.versions.puppeteer();
+  getdiv.innerHTML = "";
   console.log(new_property_array);
   if (before_property_array !== undefined) {
     if (before_property_array !== null) {
@@ -93,7 +93,7 @@ function makeBuildingLi(property_array) {
   else checkclass = "unchecked";
 
   let str = `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
-  <h2 class = ${checkclass}>
+  <h2 id = ${i} class = ${checkclass}>
     <p style="margin: 0;
     padding: 0;
     font-size: 1em;">

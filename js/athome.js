@@ -17,16 +17,6 @@ exports.athome = async function athome(page) {
 
   console.log(building_li.length);
   for (i = 0; i < building_li.length; i++) {
-    // if (i == 0) {
-    //   if (localStorage.getItem("athomesrc") != null) {
-    //     lastsrc = localStorage.getItem("athomesrc");
-    //     localStorage.removeItem("athomesrc");
-    //   }
-    //   localStorage.setItem("athomesrc", await getBuildSrc());
-    // }
-    // if (lastsrc == (await getBuildSrc())) {
-    //   break;
-    // }
     hatoarray = {
       build_src: "",
       link: "",
