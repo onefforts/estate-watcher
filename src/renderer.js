@@ -1,14 +1,32 @@
 let new_property_array;
 let before_property_array;
+let site_array;
+let link_array;
 let checkflag;
 let getdiv = document.getElementById("div");
-let div;
 window.onbeforeunload = function () {
   localStorage.clear();
   localStorage.setItem("key", JSON.stringify(new_property_array));
 };
 window.onload = function () {
   before_property_array = JSON.parse(localStorage.getItem("key"));
+  for (i = 0; i < before_property_array.length; i++) {
+    for (j = i + 1; j < before_property_array.length; j++) {
+      if (
+        before_property_array[i].price == before_property_array[j].price &&
+        before_property_array[i].land_area.substr(0, 2) ==
+          before_property_array[j].land_area.substr(0, 2)
+      ) {
+        for (k = 0; k < before_property_array[j].site_link.length; k++) {
+          before_property_array[i].site_link.push(
+            before_property_array[j].site_link[k]
+          );
+        }
+        console.log(before_property_array[i].site_link);
+        before_property_array.splice(j, 1); //jの情報をなくす
+      }
+    }
+  }
   console.log(before_property_array);
   getdiv.innerHTML = "";
   new_property_array = before_property_array;
@@ -52,8 +70,6 @@ sortbtn.addEventListener("click", async () => {
       price2 = price2.replace("万円", "");
       Number(price1);
       Number(price2);
-      console.log(price1);
-      console.log(price2);
       if (price1 > price2) {
         let tmp = new_property_array[j - 1];
         new_property_array[j - 1] = new_property_array[j];
@@ -68,6 +84,7 @@ sortbtn.addEventListener("click", async () => {
 });
 watchfilterbtn.addEventListener("click", async () => {
   getdiv.innerHTML = "";
+  console.log(new_property_array);
   for (i = 0; i < new_property_array.length; i++) {
     if (new_property_array[i].flag) {
       makeBuildingLi(new_property_array);
@@ -114,15 +131,15 @@ function makeBuildingLi(property_array) {
   if (property_array[i].flag) checkclass = "checked";
   else checkclass = "unchecked";
 
-  let str = `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
+  let str1 = `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
   <h2 id = ${i} class = ${checkclass}>
     <p style="margin: 0;
     padding: 0;
     font-size: 1em;">
-    <a href='${property_array[i].link}' target="_blank">
-        ${property_array[i].address}</a>
+    <p>${property_array[i].address}
     <button class ="watched" onclick="setFlag(${i})">チェック</button>
     <button class ="unwatched" onclick="unsetFlag(${i})">未チェック</button>
+    </p>
     </p>
   </h2>
   <div class="itemBody">
@@ -143,23 +160,19 @@ function makeBuildingLi(property_array) {
         <tr><th>土地面積</th><td>${property_array[i].land_area}</td></tr>
         <tr><th>建物面積</th><td>${property_array[i].build_area}</td></tr>
         <tr><th>築年月</th><td>${property_array[i].build_date}</td></tr>
-        <tr><th>参照サイト</th><td>${property_array[i].site}</td></tr>
-        </table>
-    </div>
-  </div>
-  </div>`;
-  if (i % 2 == 0) {
-    //iが偶数の時
-    div = document.createElement("div");
-    div.classList.add("flex");
+        <tr><th>担当会社</th><td>${property_array[i].company}</td></tr>
+        <tr><th>参照サイト</th><td>
+        `;
+  let str2 = "";
+  for (j = 0; j < property_array[i].site_link.length; j++) {
+    let tmp = `<button type="button" class=copy-btn onClick='navigator.clipboard.writeText("${property_array[i].site_link[j].link}")'>Copy</button><a href='${property_array[i].site_link[j].link}' onclick="window.open('${property_array[i].site_link[j].link}','','width=1920,height=1080'); return false;">
+        ${property_array[i].site_link[j].site}</a>,`;
+    str2 = str2 + tmp;
   }
-  let div2 = document.createElement("div");
-  div2.innerHTML = str; //html要素に変換
-  div.appendChild(div2);
-  if (i % 2 == 0) {
-    //iが偶数の時
-    getdiv.appendChild(div); //getdivに追加
-  }
+  let str3 = `</td></tr></table></div></div></div>`;
+  let str = str1 + str2 + str3;
+  let div = document.createElement("div");
+  div.innerHTML = str; //html要素に変換
+  getdiv.appendChild(div);
 }
-
 func();

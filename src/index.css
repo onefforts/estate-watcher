@@ -42,3 +42,14 @@ table.row tr{
 .row td{
   background-color: #fbf9f9;
 }
+.copy-btn {
+  padding: 3px 10px;
+  color: #FFF;
+  background: #1e90ff;
+  border: none;
+  border-radius: 10px;
+}
+
+.copy-btn:hover {
+  background: #1872cc;
+}
