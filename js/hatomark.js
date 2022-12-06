@@ -10,7 +10,7 @@ exports.hatomark = async function hatomark(page) {
       waitUntil: ["networkidle0"],
     }
   );
-  await page.select('select[name="price_b_to"]', "5000000");
+  await page.select('select[name="price_b_to"]', "10000000");
   const search_button = await getElements(
     'button[type="submit"',
     /^検索$/,

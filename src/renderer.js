@@ -61,6 +61,16 @@ const watchfilterbtn = document.getElementById("watchfilter");
 const allshowbtn = document.getElementById("allshow");
 const btn3 = document.getElementById("btn3");
 const sortbtn = document.getElementById("sort");
+const filter500 = document.getElementById("filter500");
+const filter1000 = document.getElementById("filter1000");
+filter500.addEventListener("click", async () => {
+  getdiv.innerHTML = "";
+  for (i = 0; i < new_property_array.length; i++) {
+    let price = new_property_array[i].price;
+    price = price.replace("万円", "");
+    if (price <= 500) makeBuildingLi(new_property_array);
+  }
+});
 sortbtn.addEventListener("click", async () => {
   for (i = 0; i < new_property_array.length; i++) {
     for (j = new_property_array.length - 1; i < j; j--) {

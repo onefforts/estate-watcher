@@ -5,7 +5,7 @@ let array = [];
 let site_link_object;
 exports.housego = async function housego(page) {
   await page.goto(
-    "https://house.goo.ne.jp/buy/touhoku_uh/area_fukushima/07202.html?sk=2&pu=500",
+    "https://house.goo.ne.jp/buy/touhoku_uh/area_fukushima/07202.html?sk=2&pu=1000",
     {
       waitUntil: ["networkidle0"],
     }

@@ -5,12 +5,12 @@ let site_link_object;
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 exports.aisumu = async function aisumu(page) {
   await page.goto(
-    "https://ai-sumu.com/buy/land/rail/train/station?ensen_eki%5B%5D=0e34&ensen_eki%5B%5D=0e35&ensen_eki%5B%5D=0e36&price_from=&price_to=5000000&last_upd_datetime=&walk_time=&tochi_menseki_from=&tochi_menseki_to=&freeword=",
+    "https://ai-sumu.com/buy/land/rail/train/station?ensen_eki%5B%5D=0e34&ensen_eki%5B%5D=0e35&ensen_eki%5B%5D=0e36&price_from=&price_to=10000000&last_upd_datetime=&walk_time=&tochi_menseki_from=&tochi_menseki_to=&freeword=",
     {
       waitUntil: ["networkidle0"],
     }
   );
-  await sleep(15000);
+  await sleep(10000);
   building_li = await page.$$(".property-list-one > li");
   console.log(building_li.length);
 
@@ -45,6 +45,7 @@ exports.aisumu = async function aisumu(page) {
     hatoarray.build_date = "";
     array.push(hatoarray);
   }
+  console.log(array);
   return array;
 };
 
