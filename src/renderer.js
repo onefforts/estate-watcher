@@ -13,6 +13,7 @@ window.onload = function () {
   for (i = 0; i < before_property_array.length; i++) {
     for (j = i + 1; j < before_property_array.length; j++) {
       if (
+        //値段と土地の大きさが同じ時
         before_property_array[i].price == before_property_array[j].price &&
         before_property_array[i].land_area.substr(0, 2) ==
           before_property_array[j].land_area.substr(0, 2)
@@ -22,11 +23,21 @@ window.onload = function () {
             before_property_array[j].site_link[k]
           );
         }
-        console.log(before_property_array[i].site_link);
         before_property_array.splice(j, 1); //jの情報をなくす
       }
     }
+    for (l = 0; l < before_property_array[i].site_link.length; l++) {
+      for (l2 = l + 1; l2 < before_property_array[i].site_link.length; l2++) {
+        if (
+          before_property_array[i].site_link[l].site ==
+          before_property_array[i].site_link[l2].site
+        ) {
+          before_property_array[i].site_link.splice(l2, 1);
+        }
+      }
+    }
   }
+
   console.log(before_property_array);
   getdiv.innerHTML = "";
   new_property_array = before_property_array;
@@ -68,6 +79,7 @@ filter500.addEventListener("click", async () => {
   for (i = 0; i < new_property_array.length; i++) {
     let price = new_property_array[i].price;
     price = price.replace("万円", "");
+    price = price.replace("万円", "");
     if (price <= 500) makeBuildingLi(new_property_array);
   }
 });
@@ -77,9 +89,11 @@ sortbtn.addEventListener("click", async () => {
       let price1 = new_property_array[j - 1].price;
       let price2 = new_property_array[j].price;
       price1 = price1.replace("万円", "");
+      price1 = price1.replace(",", "");
       price2 = price2.replace("万円", "");
-      Number(price1);
-      Number(price2);
+      price2 = price2.replace(",", "");
+      price1 = parseInt(price1);
+      price2 = parseInt(price2);
       if (price1 > price2) {
         let tmp = new_property_array[j - 1];
         new_property_array[j - 1] = new_property_array[j];
@@ -124,6 +138,7 @@ btn3.addEventListener("click", async () => {
             checkflag = false;
         }
         if (checkflag) {
+          //beforeに対してnewが新
           new_property_array.push(before_property_array[i]);
           console.log("新しい物件が追加されました");
         }
