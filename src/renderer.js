@@ -74,6 +74,26 @@ const btn3 = document.getElementById("btn3");
 const sortbtn = document.getElementById("sort");
 const filter500 = document.getElementById("filter500");
 const filter1000 = document.getElementById("filter1000");
+const filter_build = document.getElementById("filter_build");
+const filter_area = document.getElementById("filter_area");
+filter_build.addEventListener("click", async () => {
+  getdiv.innerHTML = "";
+  console.log(new_property_array);
+  for (i = 0; i < new_property_array.length; i++) {
+    if (!new_property_array[i].build_flag) {
+      makeBuildingLi(new_property_array);
+    }
+  }
+});
+filter_area.addEventListener("click", async () => {
+  getdiv.innerHTML = "";
+  console.log(new_property_array);
+  for (i = 0; i < new_property_array.length; i++) {
+    if (new_property_array[i].build_flag) {
+      makeBuildingLi(new_property_array);
+    }
+  }
+});
 filter500.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   for (i = 0; i < new_property_array.length; i++) {

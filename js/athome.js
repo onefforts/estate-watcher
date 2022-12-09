@@ -29,6 +29,7 @@ exports.athome = async function athome(page) {
       build_date: "",
       company: "",
       flag: false,
+      build_flag: false,
     };
     site_link_object = {
       site: "",

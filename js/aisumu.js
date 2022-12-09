@@ -26,6 +26,7 @@ exports.aisumu = async function aisumu(page) {
       build_date: "",
       company: "",
       flag: false,
+      build_flag: false,
     };
     site_link_object = {
       site: "",
@@ -43,6 +44,7 @@ exports.aisumu = async function aisumu(page) {
     hatoarray.land_area = await getLand();
     hatoarray.build_area = "";
     hatoarray.build_date = "";
+    hatoarray.build_flag = await judge_land();
     array.push(hatoarray);
   }
   console.log(array);
@@ -84,6 +86,7 @@ async function getTraffic() {
   traffic_text = traffic_text.replace(/\s+/g, "");
   return traffic_text;
 }
+("table > tbody > tr:nth-child(2) > td:nth-child(3)");
 async function getLand() {
   const land_base = await building_li[i].$(
     "div.building-info > dl > dd.detail-info > ul.one-info.width-list"
@@ -98,4 +101,15 @@ async function getPrice() {
   );
   let element_text = await (await price.getProperty("textContent")).jsonValue();
   return element_text;
+}
+async function judge_land() {
+  const judge_land = await building_li[i].$(
+    "table > tbody > tr:nth-child(2) > td:nth-child(3)"
+  );
+  let element_text = await (
+    await judge_land.getProperty("textContent")
+  ).jsonValue();
+  if (element_text == "更地") {
+    return true;
+  } else return false;
 }
