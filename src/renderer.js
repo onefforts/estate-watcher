@@ -1,4 +1,5 @@
 let new_property_array;
+let update_property_array;
 let before_property_array;
 let site_array;
 let link_array;
@@ -71,7 +72,8 @@ function unsetFlag(i) {
 const watchfilterbtn = document.getElementById("watchfilter");
 const allshowbtn = document.getElementById("allshow");
 const btn3 = document.getElementById("btn3");
-const sortbtn = document.getElementById("sort");
+const upsortbtn = document.getElementById("upsort");
+const downsortbtn = document.getElementById("downsort");
 const filter500 = document.getElementById("filter500");
 const filter1000 = document.getElementById("filter1000");
 const filter_build = document.getElementById("filter_build");
@@ -103,7 +105,7 @@ filter500.addEventListener("click", async () => {
     if (price <= 500) makeBuildingLi(new_property_array);
   }
 });
-sortbtn.addEventListener("click", async () => {
+upsortbtn.addEventListener("click", async () => {
   for (i = 0; i < new_property_array.length; i++) {
     for (j = new_property_array.length - 1; i < j; j--) {
       let price1 = new_property_array[j - 1].price;
@@ -126,6 +128,29 @@ sortbtn.addEventListener("click", async () => {
     makeBuildingLi(new_property_array);
   }
 });
+downsortbtn.addEventListener("click", async () => {
+  for (i = 0; i < new_property_array.length; i++) {
+    for (j = new_property_array.length - 1; i < j; j--) {
+      let price1 = new_property_array[j - 1].price;
+      let price2 = new_property_array[j].price;
+      price1 = price1.replace("万円", "");
+      price1 = price1.replace(",", "");
+      price2 = price2.replace("万円", "");
+      price2 = price2.replace(",", "");
+      price1 = parseInt(price1);
+      price2 = parseInt(price2);
+      if (price1 > price2) {
+        let tmp = new_property_array[j - 1];
+        new_property_array[j - 1] = new_property_array[j];
+        new_property_array[j] = tmp;
+      }
+    }
+  }
+  getdiv.innerHTML = "";
+  for (i = new_property_array.length - 1; i >= 0; i--) {
+    makeBuildingLi(new_property_array);
+  }
+});
 watchfilterbtn.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   console.log(new_property_array);
@@ -145,29 +170,29 @@ allshowbtn.addEventListener("click", async () => {
 btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
   btn3.classList.add("pushbtn");
-  new_property_array = await window.versions.puppeteer();
+  update_property_array = await window.versions.puppeteer();
   getdiv.innerHTML = "";
-  console.log(new_property_array);
-  if (before_property_array !== undefined) {
-    if (before_property_array !== null) {
+  console.log(update_property_array);
+  if (new_property_array !== undefined) {
+    if (new_property_array !== null) {
       console.log("localstorageがあります。");
-      for (i = 0; i < before_property_array.length; i++) {
+      for (i = 0; i < new_property_array.length; i++) {
         checkflag = true;
-        for (j = 0; j < new_property_array.length; j++) {
-          if (before_property_array[i].address == new_property_array[j].address)
+        for (j = 0; j < update_property_array.length; j++) {
+          if (new_property_array[i].address == update_property_array[j].address)
             checkflag = false;
         }
         if (checkflag) {
           //beforeに対してnewが新
-          new_property_array.push(before_property_array[i]);
+          update_property_array.push(new_property_array[i]);
           console.log("新しい物件が追加されました");
         }
       }
     }
   }
-  console.log(new_property_array);
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
+  console.log(update_property_array);
+  for (i = 0; i < update_property_array.length; i++) {
+    makeBuildingLi(update_property_array);
   }
   btn3.classList.remove("pushbtn");
 });

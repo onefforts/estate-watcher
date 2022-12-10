@@ -13,7 +13,7 @@ exports.aisumu = async function aisumu(page) {
   await sleep(10000);
   building_li = await page.$$(".property-list-one > li");
   console.log(building_li.length);
-
+  await page.screenshot({ path: "screenshot.png", fullPage: true });
   for (i = 0; i < building_li.length; i++) {
     hatoarray = {
       build_src: "",
