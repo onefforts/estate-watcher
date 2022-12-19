@@ -1,8 +1,6 @@
 let new_property_array;
 let update_property_array;
 let before_property_array;
-let site_array;
-let link_array;
 let checkflag;
 let getdiv = document.getElementById("div");
 window.onbeforeunload = function () {
@@ -169,6 +167,28 @@ allshowbtn.addEventListener("click", async () => {
 });
 btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
+  let opts = {
+    lines: 13, // The number of lines to draw
+    length: 33, // The length of each line
+    width: 11, // The line thickness
+    radius: 16, // The radius of the inner circle
+    corners: 1, // Corner roundness (0..1)
+    rotate: 74, // The rotation offset
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    color: "#000", // #rgb or #rrggbb or array of colors
+    speed: 1.5, // Rounds per second
+    trail: 71, // Afterglow percentage
+    shadow: true, // Whether to render a shadow
+    hwaccel: true, // Whether to use hardware acceleration
+    className: "spinner", // The CSS class to assign to the spinner
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    top: "50%", // Top position relative to parent
+    left: "30%", // Left position relative to parent
+  };
+  let target = document.getElementById("spin-area");
+  let spinner = new Spinner(opts);
+  spinner.spin(target);
+
   btn3.classList.add("pushbtn");
   update_property_array = await window.versions.puppeteer();
   getdiv.innerHTML = "";
@@ -194,7 +214,9 @@ btn3.addEventListener("click", async () => {
   for (i = 0; i < update_property_array.length; i++) {
     makeBuildingLi(update_property_array);
   }
+  new_property_array = update_property_array;
   btn3.classList.remove("pushbtn");
+  spinner.stop();
 });
 function makeBuildingLi(property_array) {
   let checkclass;
