@@ -68,6 +68,7 @@ function unsetFlag(i) {
   }
 }
 const watchfilterbtn = document.getElementById("watchfilter");
+const unwatchfilterbtn = document.getElementById("unwatchfilter");
 const allshowbtn = document.getElementById("allshow");
 const btn3 = document.getElementById("btn3");
 const upsortbtn = document.getElementById("upsort");
@@ -149,6 +150,15 @@ downsortbtn.addEventListener("click", async () => {
     makeBuildingLi(new_property_array);
   }
 });
+unwatchfilterbtn.addEventListener("click", async () => {
+  getdiv.innerHTML = "";
+  console.log(new_property_array);
+  for (i = 0; i < new_property_array.length; i++) {
+    if (!new_property_array[i].flag) {
+      makeBuildingLi(new_property_array);
+    }
+  }
+});
 watchfilterbtn.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   console.log(new_property_array);
@@ -167,56 +177,46 @@ allshowbtn.addEventListener("click", async () => {
 });
 btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
-  let opts = {
-    lines: 13, // The number of lines to draw
-    length: 33, // The length of each line
-    width: 11, // The line thickness
-    radius: 16, // The radius of the inner circle
-    corners: 1, // Corner roundness (0..1)
-    rotate: 74, // The rotation offset
-    direction: 1, // 1: clockwise, -1: counterclockwise
-    color: "#000", // #rgb or #rrggbb or array of colors
-    speed: 1.5, // Rounds per second
-    trail: 71, // Afterglow percentage
-    shadow: true, // Whether to render a shadow
-    hwaccel: true, // Whether to use hardware acceleration
-    className: "spinner", // The CSS class to assign to the spinner
-    zIndex: 2e9, // The z-index (defaults to 2000000000)
-    top: "50%", // Top position relative to parent
-    left: "30%", // Left position relative to parent
-  };
-  let target = document.getElementById("spin-area");
-  let spinner = new Spinner(opts);
-  spinner.spin(target);
-
   btn3.classList.add("pushbtn");
   update_property_array = await window.versions.puppeteer();
-  getdiv.innerHTML = "";
+  console.log(new_property_array.length + "+" + update_property_array.length);
+  console.log(new_property_array);
   console.log(update_property_array);
+  getdiv.innerHTML = "";
+  console.log(new_property_array);
+  console.log(update_property_array);
+  let tmp = [];
   if (new_property_array !== undefined) {
     if (new_property_array !== null) {
       console.log("localstorageがあります。");
-      for (i = 0; i < new_property_array.length; i++) {
+      console.log(new_property_array.length);
+      console.log(update_property_array.length);
+      for (let i = 0; i < new_property_array.length; i++) {
+        tmp.push(new_property_array[i]);
+      }
+      console.log(tmp);
+      for (let i = 0; i < update_property_array.length; i++) {
         checkflag = true;
-        for (j = 0; j < update_property_array.length; j++) {
-          if (new_property_array[i].address == update_property_array[j].address)
+        for (let j = 0; j < new_property_array.length; j++) {
+          if (
+            update_property_array[i].address == new_property_array[j].address
+          ) {
             checkflag = false;
+          }
         }
         if (checkflag) {
-          //beforeに対してnewが新
-          update_property_array.push(new_property_array[i]);
+          tmp.push(update_property_array[i]);
           console.log("新しい物件が追加されました");
         }
       }
     }
   }
-  console.log(update_property_array);
-  for (i = 0; i < update_property_array.length; i++) {
-    makeBuildingLi(update_property_array);
+  new_property_array = tmp;
+  console.log(new_property_array);
+  for (i = 0; i < new_property_array.length; i++) {
+    makeBuildingLi(new_property_array);
   }
-  new_property_array = update_property_array;
   btn3.classList.remove("pushbtn");
-  spinner.stop();
 });
 function makeBuildingLi(property_array) {
   let checkclass;
