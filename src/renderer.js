@@ -77,6 +77,25 @@ const filter500 = document.getElementById("filter500");
 const filter1000 = document.getElementById("filter1000");
 const filter_build = document.getElementById("filter_build");
 const filter_area = document.getElementById("filter_area");
+const stop_button = document.getElementById("stopbutton");
+const input = document.querySelector("input");
+const webview = document.querySelector("webview");
+webview.addEventListener("found-in-page", (e) => {
+  console.log("A");
+  webview.stopFindInPage("keepSelection");
+});
+input.addEventListener("keydown", (event) => {
+  if (event.code === "Enter") {
+    console.log(event);
+    console.log("検索開始");
+    console.log(input.value);
+    window.versions.search(input.value);
+  }
+});
+stop_button.addEventListener("click", () => {
+  // マッチした部分のハイライトを消して検索終了
+  window.versions.stopsearch();
+});
 filter_build.addEventListener("click", async () => {
   getdiv.innerHTML = "";
   console.log(new_property_array);

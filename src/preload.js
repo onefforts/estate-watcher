@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, ipcMain } = require("electron");
 
 //隔離ワールド
 contextBridge.exposeInMainWorld("versions", {
@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld("versions", {
   ping: () => ipcRenderer.invoke("ping"),
   setTitle: (title) => ipcRenderer.send("set-title", title), //タイトルを送る
   puppeteer: () => ipcRenderer.invoke("automation"),
+  search: (text) => ipcRenderer.send("search", text),
+  stopsearch: () => ipcMain.invoke("stopsearch"),
 });
 // 関数だけでなく、変数も公開できます
 

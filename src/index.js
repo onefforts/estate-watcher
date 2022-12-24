@@ -7,6 +7,10 @@ const housego = require("../js/housego.js");
 const nifty = require("../js/nifty.js");
 const aisumu = require("../js/aisumu.js");
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+let webcontents;
+let previous_text = "";
+let active;
+let result_string;
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
@@ -51,10 +55,23 @@ async function AutomationPuppeteer() {
   browser.close();
   return property_array;
 }
-
+function Search(_event, text) {
+  console.log(text);
+  if (previous_text === text) {
+    // 前回の検索時とテキストが変わっていないので次のマッチを検索
+    webcontents.findInPage(text, { findNext: true });
+  } else {
+    // 検索開始
+    previous_text = text;
+    webcontents.findInPage(text);
+  }
+}
+function StopSearch() {
+  webcontents.stopFindInPage("clearSelection");
+}
 const createWindow = () => {
   // Create the browser window.webContents
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1920,
     height: 1080,
     webPreferences: {
@@ -64,39 +81,18 @@ const createWindow = () => {
   //(preloadのkey"set-title"からtitle文字列取得,handleSetTitleにipcMainEvent構造体とtitleを送る)
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   //////////////////////////////////////////////////////////////
-  const previous_text = "";
-  const webcontents = mainWindow.webContents;
+
+  webcontents = mainWindow.webContents;
   webcontents.on("found-in-page", (event, result) => {
     if (result.activeMatchOrdinal) {
-      this.active = activeMatchOrdinal;
+      console.log(result);
+      active = result.activeMatchOrdinal;
     } //アクティブなマッチの位置を覚えておく
     if (result.finalUpdate) {
-      this.result_string = `${this.active}/${result.matches}`;
+      result_string = `${active}/${result.matches}`;
     } // M個のマッチ中 N 番目がアクティブな時，N/M という文字列をつくる
   });
-  function search(text) {
-    if (previous_text === text) {
-      // 前回の検索時とテキストが変わっていないので次のマッチを検索
-      webcontents.findInPage(text, { findNext: true });
-    } else {
-      // 検索開始
-      previous_text = text;
-      webcontents.findInPage(text);
-    }
-  }
 
-  const input = document.querySelector("input");
-  input.addEventListener("keydown", (event) => {
-    if (event.code === "Enter") {
-      search(input.value);
-    }
-  });
-
-  const stop_button = document.querySelector("button");
-  stop_button.addEventListener("click", () => {
-    // マッチした部分のハイライトを消して検索終了
-    webcontents.stopFindInPage("clearSelection");
-  });
   ////////////////////////////////////////////////////////////////
   //mainWindowにindex.html読み込み
   mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
@@ -105,6 +101,8 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("ping", () => "pong"); //setup送信,preloadのinvoke("ping")
   ipcMain.handle("automation", AutomationPuppeteer);
+  ipcMain.on("search", Search);
+  ipcMain.handle("stopsearch", StopSearch);
   createWindow();
   app.on("activate", () => {
     //activateをリッスン(mac用)
