@@ -58,12 +58,12 @@ async function AutomationPuppeteer() {
 function Search(_event, text) {
   console.log(text);
   if (previous_text === text) {
-    // 前回の検索時とテキストが変わっていないので次のマッチを検索
     webcontents.findInPage(text, { findNext: true });
+    // 前回の検索時とテキストが変わっていないので次のマッチを検索
   } else {
     // 検索開始
     previous_text = text;
-    webcontents.findInPage(text);
+    webcontents.findInPage(text); //api使用
   }
 }
 function StopSearch() {
@@ -84,6 +84,8 @@ const createWindow = () => {
 
   webcontents = mainWindow.webContents;
   webcontents.on("found-in-page", (event, result) => {
+    console.log(event);
+    //api作成,インスタンス化
     if (result.activeMatchOrdinal) {
       console.log(result);
       active = result.activeMatchOrdinal;
