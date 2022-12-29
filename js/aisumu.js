@@ -7,7 +7,7 @@ exports.aisumu = async function aisumu(page) {
   await page.goto(
     "https://ai-sumu.com/buy/land/rail/train/station?ensen_eki%5B%5D=0e34&ensen_eki%5B%5D=0e35&ensen_eki%5B%5D=0e36&price_from=&price_to=10000000&last_upd_datetime=&walk_time=&tochi_menseki_from=&tochi_menseki_to=&freeword=",
     {
-      waitUntil: ["networkidle0"],
+      waitUntil: ["networkidle2"],
     }
   );
   await sleep(10000);

@@ -11,7 +11,8 @@ exports.athome = async function athome(page) {
     }
   );
   //////////////////認証エラー
-  await sleep(3000);
+  await sleep(10000);
+  await page.screenshot({ path: "screenshot2.png", fullPage: true });
   await page.select('select[name="PRICETO"]', "kp102");
   await sleep(10000);
   building_li = await page.$$("#item-list > .object");
