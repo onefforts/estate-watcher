@@ -12,17 +12,26 @@ window.onload = function () {
   for (i = 0; i < before_property_array.length; i++) {
     for (j = i + 1; j < before_property_array.length; j++) {
       if (
-        //値段と土地の大きさが同じ時
-        before_property_array[i].price == before_property_array[j].price &&
         before_property_array[i].land_area.substr(0, 2) ==
-          before_property_array[j].land_area.substr(0, 2)
+        before_property_array[j].land_area.substr(0, 2)
       ) {
-        for (k = 0; k < before_property_array[j].site_link.length; k++) {
-          before_property_array[i].site_link.push(
-            before_property_array[j].site_link[k]
-          );
+        if (
+          before_property_array[i].build_date.substr(0, 3) ==
+            before_property_array[j].build_date.substr(0, 3) ||
+          before_property_array[j].build_date == ""
+        ) {
+          if (
+            before_property_array[i].price !== before_property_array[j].price
+          ) {
+            before_property_array[i].price = before_property_array[j].price;
+          }
+          for (k = 0; k < before_property_array[j].site_link.length; k++) {
+            before_property_array[i].site_link.push(
+              before_property_array[j].site_link[k]
+            );
+          }
+          before_property_array.splice(j, 1); //jの情報をなくす
         }
-        before_property_array.splice(j, 1); //jの情報をなくす
       }
     }
     for (l = 0; l < before_property_array[i].site_link.length; l++) {
@@ -216,8 +225,12 @@ btn3.addEventListener("click", async () => {
             update_property_array[i].address == new_property_array[j].address
           ) {
             checkflag = false;
-            console.log(tmp[j].price);
-            tmp[j].price = update_property_array[i].price;
+            if (tmp[j].price !== update_property_array[i].price) {
+              console.log(
+                `${update_property_array[i].price}から${tmp[j].price}に変わりました`
+              );
+              tmp[j].price = update_property_array[i].price;
+            }
           }
         }
         if (checkflag) {
