@@ -11,7 +11,6 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let webcontents;
 let previous_text = "";
 let active;
-let result_string;
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
@@ -26,8 +25,8 @@ async function AutomationPuppeteer() {
   //配列にhatoarrayが入ったものが帰ってくる
   const aisumu_array = await aisumu.aisumu(page);
   console.log(aisumu_array.length);
-  //const athome_array = await athome.athome(page);
-  //console.log(athome_array);
+  // const athome_array = await athome.athome(page);
+  // console.log(athome_array.length);
   const hatomark_array = await hatomark.hatomark(page);
   console.log(hatomark_array.length);
   const housego_array = await housego.housego(page);

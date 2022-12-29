@@ -15,20 +15,14 @@ window.onload = function () {
         before_property_array[i].land_area.substr(0, 2) ==
         before_property_array[j].land_area.substr(0, 2)
       ) {
-        if (
-          before_property_array[i].build_date.substr(0, 3) ==
-            before_property_array[j].build_date.substr(0, 3) ||
-          before_property_array[j].build_date == ""
-        ) {
-          if (
-            before_property_array[i].price !== before_property_array[j].price
-          ) {
-            before_property_array[i].price = before_property_array[j].price;
-          }
+        if (before_property_array[i].price == before_property_array[j].price) {
           for (k = 0; k < before_property_array[j].site_link.length; k++) {
             before_property_array[i].site_link.push(
               before_property_array[j].site_link[k]
             );
+            if (before_property_array[j].flag) {
+              before_property_array.flag = true;
+            }
           }
           before_property_array.splice(j, 1); //jの情報をなくす
         }
@@ -208,47 +202,62 @@ btn3.addEventListener("click", async () => {
   btn3.classList.add("pushbtn");
   update_property_array = await window.versions.puppeteer();
   getdiv.innerHTML = "";
+  // let tmp = [];
+  // if (new_property_array !== undefined) {
+  //   if (new_property_array !== null) {
+  //     console.log("localstorageがあります。");
+  //     console.log(new_property_array.length);
+  //     console.log(update_property_array.length);
+  //     for (let i = 0; i < new_property_array.length; i++) {
+  //       tmp.push(new_property_array[i]);
+  //     }
+  //     console.log(tmp);
+  //     for (let i = 0; i < update_property_array.length; i++) {
+  //       checkflag = true;
+  //       for (let j = 0; j < new_property_array.length; j++) {
+  //         if (
+  //           update_property_array[i].address == new_property_array[j].address
+  //         ) {
+  //           checkflag = false;
+  //           if (tmp[j].price !== update_property_array[i].price) {
+  //             console.log(
+  //               `${update_property_array[i].price}から${tmp[j].price}に変わりました`
+  //             );
+  //             tmp[j].price = update_property_array[i].price;
+  //           }
+  //         }
+  //       }
+  //       if (checkflag) {
+  //         tmp.push(update_property_array[i]);
+  //         console.log("新しい物件が追加されました");
+  //       }
+  //     }
+  //     new_property_array = tmp;
+  //   }
+  // }
+  // if (new_property_array == undefined || new_property_array == null) {
+  //   new_property_array = update_property_array;
+  // }
+  // console.log(new_property_array);
   let tmp = [];
-  if (new_property_array !== undefined) {
-    if (new_property_array !== null) {
-      console.log("localstorageがあります。");
-      console.log(new_property_array.length);
-      console.log(update_property_array.length);
-      for (let i = 0; i < new_property_array.length; i++) {
-        tmp.push(new_property_array[i]);
-      }
-      console.log(tmp);
-      for (let i = 0; i < update_property_array.length; i++) {
-        checkflag = true;
-        for (let j = 0; j < new_property_array.length; j++) {
-          if (
-            update_property_array[i].address == new_property_array[j].address
-          ) {
-            checkflag = false;
-            if (tmp[j].price !== update_property_array[i].price) {
-              console.log(
-                `${update_property_array[i].price}から${tmp[j].price}に変わりました`
-              );
-              tmp[j].price = update_property_array[i].price;
-            }
-          }
-        }
-        if (checkflag) {
-          tmp.push(update_property_array[i]);
-          console.log("新しい物件が追加されました");
-        }
-      }
-      new_property_array = tmp;
+  for (let i = 0; i < new_property_array.length; i++) {
+    if (new_property_array[i].flag) {
+      tmp.push(new_property_array[i]);
     }
   }
-  if (new_property_array == undefined || new_property_array == null) {
-    new_property_array = update_property_array;
+  for (let i = 0; i < update_property_array.length; i++) {
+    for (j = 0; j < tmp.length; j++) {
+      if (update_property_array[i].address == tmp[j].address) {
+        update_property_array[i].flag = true;
+      }
+    }
   }
-  console.log(new_property_array);
-
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
+  for (let i = 0; i < update_property_array.length; i++) {
+    makeBuildingLi(update_property_array);
   }
+  new_property_array = update_property_array;
+  localStorage.clear();
+  localStorage.setItem("key", JSON.stringify(new_property_array));
   btn3.classList.remove("pushbtn");
 });
 function makeBuildingLi(property_array) {
