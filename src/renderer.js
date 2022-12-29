@@ -198,12 +198,7 @@ btn3.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
   btn3.classList.add("pushbtn");
   update_property_array = await window.versions.puppeteer();
-  console.log(new_property_array.length + "+" + update_property_array.length);
-  console.log(new_property_array);
-  console.log(update_property_array);
   getdiv.innerHTML = "";
-  console.log(new_property_array);
-  console.log(update_property_array);
   let tmp = [];
   if (new_property_array !== undefined) {
     if (new_property_array !== null) {
@@ -228,10 +223,14 @@ btn3.addEventListener("click", async () => {
           console.log("新しい物件が追加されました");
         }
       }
+      new_property_array = tmp;
     }
   }
-  new_property_array = tmp;
+  if (new_property_array == undefined || new_property_array == null) {
+    new_property_array = update_property_array;
+  }
   console.log(new_property_array);
+
   for (i = 0; i < new_property_array.length; i++) {
     makeBuildingLi(new_property_array);
   }

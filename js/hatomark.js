@@ -17,6 +17,8 @@ exports.hatomark = async function hatomark(page) {
     page
   );
   search_button.click();
+  await sleep(3000);
+  await page.select('select[name="limit"]', "100");
   await sleep(10000);
   const list_table = await page.$(".list-table");
   building_li = await list_table.$$(".col-12"); //偶数でカード

@@ -47,7 +47,6 @@ exports.aisumu = async function aisumu(page) {
     hatoarray.build_flag = await judge_land();
     array.push(hatoarray);
   }
-  console.log(array);
   return array;
 };
 

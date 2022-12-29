@@ -10,6 +10,8 @@ exports.housego = async function housego(page) {
       waitUntil: ["networkidle0"],
     }
   );
+  await sleep(3000);
+  await page.select('select[name="ps"]', "80");
   await sleep(10000);
   building_li = await page.$$(".rent_tabel_box > table.property > tbody");
 

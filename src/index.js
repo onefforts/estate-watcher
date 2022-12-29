@@ -6,6 +6,7 @@ const hatomark = require("../js/hatomark.js");
 const housego = require("../js/housego.js");
 const nifty = require("../js/nifty.js");
 const aisumu = require("../js/aisumu.js");
+const housestation = require("../js/housestation.js");
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let webcontents;
 let previous_text = "";
@@ -23,15 +24,18 @@ async function AutomationPuppeteer() {
   const property_array = [];
   await sleep(5000);
   //配列にhatoarrayが入ったものが帰ってくる
-  const hatomark_array = await hatomark.hatomark(page);
-  console.log(hatomark_array.length);
-  //const athome_array = await athome.athome(page);
-  const housego_array = await housego.housego(page);
-  console.log(housego_array.length);
-  const nifty_array = await nifty.nifty(page);
-  console.log(nifty_array.length);
   const aisumu_array = await aisumu.aisumu(page);
   console.log(aisumu_array.length);
+  //const athome_array = await athome.athome(page);
+  //console.log(athome_array);
+  const hatomark_array = await hatomark.hatomark(page);
+  console.log(hatomark_array.length);
+  const housego_array = await housego.housego(page);
+  console.log(housego_array.length);
+  const housestation_array = await housestation.housestation(page);
+  console.log(housestation_array.length);
+  const nifty_array = await nifty.nifty(page);
+  console.log(nifty_array.length);
   for (let i = 0; i < hatomark_array.length; i++) {
     property_array.push(hatomark_array[i]);
     console.log("A" + i);
@@ -50,6 +54,10 @@ async function AutomationPuppeteer() {
   for (let i = 0; i < aisumu_array.length; i++) {
     console.log("D" + i);
     property_array.push(aisumu_array[i]);
+  }
+  for (let i = 0; i < housestation_array.length; i++) {
+    console.log("E" + i);
+    property_array.push(housestation_array[i]);
   }
   console.log(property_array.length);
   browser.close();
