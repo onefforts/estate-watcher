@@ -216,6 +216,8 @@ btn3.addEventListener("click", async () => {
             update_property_array[i].address == new_property_array[j].address
           ) {
             checkflag = false;
+            console.log(tmp[j].price);
+            tmp[j].price = update_property_array[i].price;
           }
         }
         if (checkflag) {
