@@ -1,6 +1,8 @@
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let hatoarray;
-let array = [];
 let building_li;
+let array = [];
+let site_link_object;
 exports.hatomark = async function hatomark(page) {
   await page.goto(
     "https://www.hatomarksite.com/search/zentaku/buy/house/area/07/list?m_adr%5B%5d=07202&m_adr%5B%5d=07203&m_adr%5B%5d=07208&m_adr%5B%5d=07408&m_adr%5B%5d=07421&page=1",
@@ -8,39 +10,54 @@ exports.hatomark = async function hatomark(page) {
       waitUntil: ["networkidle0"],
     }
   );
-  await page.select('select[name="price_b_to"]', "5000000");
+  await page.select('select[name="price_b_to"]', "10000000");
   const search_button = await getElements(
     'button[type="submit"',
     /^検索$/,
     page
   );
   search_button.click();
-  await page.waitForNavigation();
+  await sleep(3000);
+  await page.select('select[name="limit"]', "100");
+  await sleep(10000);
   const list_table = await page.$(".list-table");
   building_li = await list_table.$$(".col-12"); //偶数でカード
   console.log(building_li.length);
   for (i = 0; i < building_li.length - 1; i = i + 2) {
     hatoarray = {
       build_src: "",
-      link: "",
+      site_link: "",
       address: "",
       traffic: "",
       price: "",
       land_area: "",
-      site: "",
       build_area: "",
       build_date: "",
-      flag: "true",
+      company: "",
+      flag: false,
+      build_flag: false,
     };
+    site_link_object = {
+      site: "",
+      link: "",
+    };
+    let site_link_array = [];
     hatoarray.build_src = await getBuildSrc();
-    hatoarray.link = await getLink(page);
+    site_link_object.link = await getLink(page);
+    site_link_object.site = "ハトマーク";
+    site_link_array.push(site_link_object);
+    hatoarray.site_link = site_link_array;
     hatoarray.address = await getAdress();
     hatoarray.traffic = await getTraffic();
     hatoarray.price = await getTableItem(/価格/);
-    hatoarray.land_area = await getTableItem(/土地面積/);
+    let land_area = await getTableItem(/土地面積/);
+    land_area = land_area.split("公簿").join("");
+    land_area = land_area.split(",").join("");
+    hatoarray.land_area = land_area;
     hatoarray.site = "ハトマーク";
     hatoarray.build_area = await getTableItem(/建物面積/);
     hatoarray.build_date = await getTableItem(/築年月/);
+    hatoarray.company = await getCompany();
     array.push(hatoarray);
   }
   return array;
@@ -79,6 +96,13 @@ async function getTableItem(keyword) {
     await element.getProperty("textContent")
   ).jsonValue();
   return element_text;
+}
+async function getCompany() {
+  const company = await building_li[i].$(".text-end");
+  const company_text = await (
+    await company.getProperty("textContent")
+  ).jsonValue();
+  return company_text;
 }
 
 async function getElements(Elementname, textContent, A) {

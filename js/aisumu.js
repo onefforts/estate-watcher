@@ -1,41 +1,52 @@
 let hatoarray;
-let array = [];
 let building_li;
+let array = [];
+let site_link_object;
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 exports.aisumu = async function aisumu(page) {
   await page.goto(
-    "https://ai-sumu.com/buy/land/rail/train/station?ensen_eki%5B%5D=0e34&ensen_eki%5B%5D=0e35&ensen_eki%5B%5D=0e36&price_from=&price_to=5000000&last_upd_datetime=&walk_time=&tochi_menseki_from=&tochi_menseki_to=&freeword=",
+    "https://ai-sumu.com/buy/land/rail/train/station?ensen_eki%5B%5D=0e34&ensen_eki%5B%5D=0e35&ensen_eki%5B%5D=0e36&price_from=&price_to=10000000&last_upd_datetime=&walk_time=&tochi_menseki_from=&tochi_menseki_to=&freeword=",
     {
-      waitUntil: ["networkidle0"],
+      waitUntil: ["networkidle2"],
     }
   );
+  await sleep(10000);
   building_li = await page.$$(".property-list-one > li");
   console.log(building_li.length);
-
+  await page.screenshot({ path: "screenshot.png", fullPage: true });
   for (i = 0; i < building_li.length; i++) {
     hatoarray = {
       build_src: "",
-      link: "",
+      site_link: "",
       address: "",
       traffic: "",
       price: "",
       land_area: "",
-      site: "",
       build_area: "",
       build_date: "",
-      flag: "true",
+      company: "",
+      flag: false,
+      build_flag: false,
     };
+    site_link_object = {
+      site: "",
+      link: "",
+    };
+    let site_link_array = [];
     hatoarray.build_src = await getBuildSrc();
-    hatoarray.link = await getLink(page);
+    site_link_object.link = await getLink(page);
+    site_link_object.site = "あいすむ";
+    site_link_array.push(site_link_object);
+    hatoarray.site_link = site_link_array;
     hatoarray.address = await getAdress();
     hatoarray.traffic = await getTraffic();
     hatoarray.price = await getPrice();
     hatoarray.land_area = await getLand();
-    hatoarray.site = "あいすむ";
     hatoarray.build_area = "";
     hatoarray.build_date = "";
+    hatoarray.build_flag = await judge_land();
     array.push(hatoarray);
   }
-  console.log(array);
   return array;
 };
 
@@ -74,6 +85,7 @@ async function getTraffic() {
   traffic_text = traffic_text.replace(/\s+/g, "");
   return traffic_text;
 }
+("table > tbody > tr:nth-child(2) > td:nth-child(3)");
 async function getLand() {
   const land_base = await building_li[i].$(
     "div.building-info > dl > dd.detail-info > ul.one-info.width-list"
@@ -88,4 +100,15 @@ async function getPrice() {
   );
   let element_text = await (await price.getProperty("textContent")).jsonValue();
   return element_text;
+}
+async function judge_land() {
+  const judge_land = await building_li[i].$(
+    "table > tbody > tr:nth-child(2) > td:nth-child(3)"
+  );
+  let element_text = await (
+    await judge_land.getProperty("textContent")
+  ).jsonValue();
+  if (element_text == "更地") {
+    return true;
+  } else return false;
 }
