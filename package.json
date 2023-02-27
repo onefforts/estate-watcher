@@ -20,6 +20,7 @@
   "dependencies": {
     "electron-db": "^0.15.7",
     "electron-json-storage": "^4.6.0",
+    "electron-reload": "^2.0.0-alpha.1",
     "electron-squirrel-startup": "^1.0.0",
     "puppeteer": "^19.3.0",
     "puppeteer-autoscroll-down": "^1.1.1",

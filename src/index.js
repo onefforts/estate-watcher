@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const electronReload = require('electron-reload')
+
 const path = require("path");
 const { default: puppeteer } = require("puppeteer");
 const athome = require("../js/athome.js");
@@ -6,7 +8,7 @@ const hatomark = require("../js/hatomark.js");
 const housego = require("../js/housego.js");
 const nifty = require("../js/nifty.js");
 const aisumu = require("../js/aisumu.js");
-const housestation = require("../js/housestation.js");
+const iestation = require("../js/iestation.js");
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let webcontents;
 let previous_text = "";
@@ -14,53 +16,42 @@ let active;
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
-async function AutomationPuppeteer() {
+const isDev = true; //process.env.NODE_ENV === 'development';
+
+// macとwinでElectron実行のPATHが違う
+const execPath =
+  process.platform === 'win32'
+    ? '../node_modules/electron/dist/electron.exe'
+    : '../node_modules/.bin/electron';
+
+if (isDev) {
+  electronReload(__dirname, {
+    electron: path.resolve(__dirname, execPath)
+  });
+
+  const fs = require('fs');
+  fs.watch(path.resolve(__dirname, '../js'), () => { // 監視対象が変更されたら
+    mainWindow.reload(); // mainWindow(rendererプロセス)をreloadする
+  });
+}
+
+async function fetchProperties() {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ["--no-sandbox"],
+    args: ['--no-sandbox --profile-directory="profile_estate-watcher"'],
+    userDataDir: "./profile_estate-watcher"
   });
-  const page = await browser.newPage();
-  const property_array = [];
-  await sleep(5000);
-  //配列にhatoarrayが入ったものが帰ってくる
-  const aisumu_array = await aisumu.aisumu(page);
-  console.log(aisumu_array.length);
-  // const athome_array = await athome.athome(page);
-  // console.log(athome_array.length);
-  const hatomark_array = await hatomark.hatomark(page);
-  console.log(hatomark_array.length);
-  const housego_array = await housego.housego(page);
-  console.log(housego_array.length);
-  const housestation_array = await housestation.housestation(page);
-  console.log(housestation_array.length);
-  const nifty_array = await nifty.nifty(page);
-  console.log(nifty_array.length);
-  for (let i = 0; i < hatomark_array.length; i++) {
-    property_array.push(hatomark_array[i]);
-    console.log("A" + i);
-  }
-  // for (let i = 0; i < athome_array.length; i++) {
-  //   property_array.push(athome_array[i]);
-  // }
-  for (let i = 0; i < housego_array.length; i++) {
-    property_array.push(housego_array[i]);
-    console.log("B" + i);
-  }
-  for (let i = 0; i < nifty_array.length; i++) {
-    property_array.push(nifty_array[i]);
-    console.log("C" + i);
-  }
-  for (let i = 0; i < aisumu_array.length; i++) {
-    console.log("D" + i);
-    property_array.push(aisumu_array[i]);
-  }
-  for (let i = 0; i < housestation_array.length; i++) {
-    console.log("E" + i);
-    property_array.push(housestation_array[i]);
-  }
-  console.log(property_array.length);
-  browser.close();
-  return property_array;
+
+  const properties = (await Promise.all([
+      aisumu.getProperties(browser),
+      // athome.getProperties(browser),
+      hatomark.getProperties(browser),
+      housego.getProperties(browser),
+      iestation.getProperties(browser),
+      nifty.getProperties(browser)
+    ])).flat(1);
+
+  return properties;
 }
 function Search(_event, text) {
   console.log(text);
@@ -105,11 +96,12 @@ const createWindow = () => {
   ////////////////////////////////////////////////////////////////
   //mainWindowにindex.html読み込み
   mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
+  mainWindow.webContents.openDevTools();
+
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle("ping", () => "pong"); //setup送信,preloadのinvoke("ping")
-  ipcMain.handle("automation", AutomationPuppeteer);
+  ipcMain.handle("fetchProperties", fetchProperties);
   ipcMain.on("search", Search);
   ipcMain.handle("stopsearch", StopSearch);
   createWindow();

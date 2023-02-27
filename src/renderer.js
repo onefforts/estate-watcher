@@ -1,242 +1,142 @@
-let new_property_array;
-let update_property_array;
-let before_property_array;
-let checkflag;
-let getdiv = document.getElementById("div");
-window.onbeforeunload = function () {
-  localStorage.clear();
-  localStorage.setItem("key", JSON.stringify(new_property_array));
-};
-window.onload = function () {
-  before_property_array = JSON.parse(localStorage.getItem("key"));
-  for (i = 0; i < before_property_array.length; i++) {
-    for (j = i + 1; j < before_property_array.length; j++) {
-      if (
-        before_property_array[i].land_area.substr(0, 2) ==
-        before_property_array[j].land_area.substr(0, 2)
-      ) {
-        if (before_property_array[i].price == before_property_array[j].price) {
-          for (k = 0; k < before_property_array[j].site_link.length; k++) {
-            before_property_array[i].site_link.push(
-              before_property_array[j].site_link[k]
-            );
-            if (before_property_array[j].flag) {
-              before_property_array.flag = true;
-            }
-          }
-          before_property_array.splice(j, 1); //jの情報をなくす
-        }
-      }
-    }
-    for (l = 0; l < before_property_array[i].site_link.length; l++) {
-      for (l2 = l + 1; l2 < before_property_array[i].site_link.length; l2++) {
-        if (
-          before_property_array[i].site_link[l].site ==
-          before_property_array[i].site_link[l2].site
-        ) {
-          before_property_array[i].site_link.splice(l2, 1);
-        }
-      }
-    }
-  }
+let listProperties = [];
+let propertyMap = {}
 
-  console.log(before_property_array);
-  getdiv.innerHTML = "";
-  new_property_array = before_property_array;
-  for (i = 0; i < before_property_array.length; i++) {
-    makeBuildingLi(before_property_array);
-  }
-};
-const func = async () => {
-  const response = await window.versions.ping();
-  console.log(response); // 'pong' と出力
+window.onbeforeunload = function () {};
+
+window.onload = function () {
+  listProperties = JSON.parse(localStorage.getItem("listProperties")) || [];
+  propertyMap = JSON.parse(localStorage.getItem("propertyMap")) || {};
+
+  renderProperties(listProperties);
+
 };
 function setFlag(i) {
-  //元々falseでチェックでtrue
-  Number(i);
-  new_property_array[i].flag = true;
+  listProperties[i].isUnwatching = true;
   let h2 = document.getElementById(i);
-  if (h2.classList.contains("unchecked")) {
-    h2.classList.remove("unchecked");
-    h2.classList.add("checked");
+  if (h2.classList.contains("unwatching")) {
+    h2.classList.remove("unwatching");
+    h2.classList.add("watching");
   }
 }
 function unsetFlag(i) {
-  Number(i);
-  new_property_array[i].flag = false;
+  listProperties[i].isUnwatching = false;
   let h2 = document.getElementById(`${i}`);
-  if (h2.classList.contains("checked")) {
-    h2.classList.remove("checked");
-    h2.classList.add("unchecked");
+  if (h2.classList.contains("watching")) {
+    h2.classList.remove("watching");
+    h2.classList.add("unwatching");
   }
 }
 const watchfilterbtn = document.getElementById("watchfilter");
 const unwatchfilterbtn = document.getElementById("unwatchfilter");
 const allshowbtn = document.getElementById("allshow");
-const btn3 = document.getElementById("btn3");
-const upsortbtn = document.getElementById("upsort");
-const downsortbtn = document.getElementById("downsort");
+const fetchBtn = document.getElementById("fetchBtn");
+const sortAskBtn = document.getElementById("sortAskBtn");
+const sortDescBtn = document.getElementById("sortDescBtn");
 const filter500 = document.getElementById("filter500");
 const filter1000 = document.getElementById("filter1000");
 const filter_build = document.getElementById("filter_build");
-const filter_area = document.getElementById("filter_area");
-const stop_button = document.getElementById("stopbutton");
-const input = document.querySelector("input");
-const webview = document.querySelector("webview");
-webview.addEventListener("found-in-page", (e) => {
-  console.log("A");
-  webview.stopFindInPage("keepSelection");
-});
-input.addEventListener("keydown", (event) => {
-  if (event.code === "Enter") {
-    console.log(event);
-    console.log("検索開始");
-    console.log(input.value);
-    window.versions.search(input.value);
-  }
-});
-stop_button.addEventListener("click", () => {
-  // マッチした部分のハイライトを消して検索終了
-  window.versions.stopsearch();
-});
+
 filter_build.addEventListener("click", async () => {
-  getdiv.innerHTML = "";
-  console.log(new_property_array);
-  for (i = 0; i < new_property_array.length; i++) {
-    if (!new_property_array[i].build_flag) {
-      makeBuildingLi(new_property_array);
-    }
-  }
-});
-filter_area.addEventListener("click", async () => {
-  getdiv.innerHTML = "";
-  console.log(new_property_array);
-  for (i = 0; i < new_property_array.length; i++) {
-    if (new_property_array[i].build_flag) {
-      makeBuildingLi(new_property_array);
-    }
-  }
+  console.log(listProperties);
+
+  renderProperties(listProperties);
 });
 filter500.addEventListener("click", async () => {
-  getdiv.innerHTML = "";
-  for (i = 0; i < new_property_array.length; i++) {
-    let price = new_property_array[i].price;
+  for (i = 0; i < listProperties.length; i++) {
+    let price = listProperties[i].price;
     price = price.replace("万円", "");
     price = price.replace("万円", "");
-    if (price <= 500) makeBuildingLi(new_property_array);
+    if (price <= 500) 1;
   }
+  renderProperties(listProperties);
+
 });
-upsortbtn.addEventListener("click", async () => {
-  for (i = 0; i < new_property_array.length; i++) {
-    for (j = new_property_array.length - 1; i < j; j--) {
-      let price1 = new_property_array[j - 1].price;
-      let price2 = new_property_array[j].price;
-      price1 = price1.replace("万円", "");
-      price1 = price1.replace(",", "");
-      price2 = price2.replace("万円", "");
-      price2 = price2.replace(",", "");
-      price1 = parseInt(price1);
-      price2 = parseInt(price2);
-      if (price1 > price2) {
-        let tmp = new_property_array[j - 1];
-        new_property_array[j - 1] = new_property_array[j];
-        new_property_array[j] = tmp;
-      }
-    }
-  }
-  getdiv.innerHTML = "";
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
-  }
+
+sortAskBtn.addEventListener("click", async () => {
+  listProperties.sort((l1, l2) => {
+    const price1 = parseInt(l1.price.replace("万円", "").replace(",", ""));
+    const price2 = parseInt(l2.price.replace("万円", "").replace(",", ""));
+
+    return price1 - price2;
+  });
+
+  renderProperties(listProperties);
 });
-downsortbtn.addEventListener("click", async () => {
-  for (i = 0; i < new_property_array.length; i++) {
-    for (j = new_property_array.length - 1; i < j; j--) {
-      let price1 = new_property_array[j - 1].price;
-      let price2 = new_property_array[j].price;
-      price1 = price1.replace("万円", "");
-      price1 = price1.replace(",", "");
-      price2 = price2.replace("万円", "");
-      price2 = price2.replace(",", "");
-      price1 = parseInt(price1);
-      price2 = parseInt(price2);
-      if (price1 > price2) {
-        let tmp = new_property_array[j - 1];
-        new_property_array[j - 1] = new_property_array[j];
-        new_property_array[j] = tmp;
-      }
-    }
-  }
-  getdiv.innerHTML = "";
-  for (i = new_property_array.length - 1; i >= 0; i--) {
-    makeBuildingLi(new_property_array);
-  }
+
+sortDescBtn.addEventListener("click", async () => {
+  listProperties.sort((l1, l2) => {
+    const price1 = parseInt(l1.price.replace("万円", "").replace(",", ""));
+    const price2 = parseInt(l2.price.replace("万円", "").replace(",", ""));
+
+    return price2 - price1;
+  });
+
+  renderProperties(listProperties);
 });
+
 unwatchfilterbtn.addEventListener("click", async () => {
-  getdiv.innerHTML = "";
-  console.log(new_property_array);
-  for (i = 0; i < new_property_array.length; i++) {
-    if (!new_property_array[i].flag) {
-      makeBuildingLi(new_property_array);
+  console.log(listProperties);
+  for (i = 0; i < listProperties.length; i++) {
+    if (!listProperties[i].isUnwatching) {
     }
   }
+  renderProperties(listProperties);
 });
 watchfilterbtn.addEventListener("click", async () => {
-  getdiv.innerHTML = "";
-  console.log(new_property_array);
-  for (i = 0; i < new_property_array.length; i++) {
-    if (new_property_array[i].flag) {
-      makeBuildingLi(new_property_array);
+  console.log(listProperties);
+  for (i = 0; i < listProperties.length; i++) {
+    if (listProperties[i].isUnwatching) {
     }
   }
+  renderProperties(listProperties);
 });
 allshowbtn.addEventListener("click", async () => {
   console.log("全表示ボタンがクリックされました");
-  getdiv.innerHTML = "";
-  for (i = 0; i < new_property_array.length; i++) {
-    makeBuildingLi(new_property_array);
-  }
+  renderProperties(listProperties);
 });
-btn3.addEventListener("click", async () => {
+fetchBtn.addEventListener("click", async () => {
   console.log("更新ボタンが押されました");
-  btn3.classList.add("pushbtn");
-  update_property_array = await window.versions.puppeteer();
-  getdiv.innerHTML = "";
+  fetchBtn.classList.add("pushbtn");
+  const latestProperties = await window.org.fetchProperties();
 
-  let tmp = [];
-  for (let i = 0; i < new_property_array.length; i++) {
-    if (new_property_array[i].flag) {
-      tmp.push(new_property_array[i]);
-    }
-  }
-  for (let i = 0; i < update_property_array.length; i++) {
-    for (j = 0; j < tmp.length; j++) {
-      if (update_property_array[i].address == tmp[j].address) {
-        update_property_array[i].flag = true;
-      }
-    }
-  }
-  for (let i = 0; i < update_property_array.length; i++) {
-    makeBuildingLi(update_property_array);
-  }
-  new_property_array = update_property_array;
-  localStorage.clear();
-  localStorage.setItem("key", JSON.stringify(new_property_array));
-  btn3.classList.remove("pushbtn");
+  Object.keys(propertyMap).forEach(k => {
+    propertyMap[k].isListing = false;
+  });
+
+  let tempListProperties = [];
+  latestProperties.forEach((p)=> {
+    const key = getKeyFromProperty(p);
+    if(!propertyMap[key]) propertyMap[key] = p;
+    else propertyMap[key].siteMap = {...propertyMap[key].siteMap, ...p.siteMap} 
+
+    propertyMap[key].isListing;
+    tempListProperties.push(propertyMap[key]);
+  })
+
+  const listProperties = [...new Set(tempListProperties)];
+  renderProperties(listProperties);
+
+  localStorage.setItem("propertyMap", JSON.stringify(propertyMap));
+  localStorage.setItem("listProperties", JSON.stringify(listProperties));
+  fetchBtn.classList.remove("pushbtn");
 });
-function makeBuildingLi(property_array) {
-  let checkclass;
-  if (property_array[i].flag) checkclass = "checked";
-  else checkclass = "unchecked";
 
-  let str1 = `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
-  <h2 id = ${i} class = ${checkclass}>
+function genPropertyListTag(property, i) {
+  let pageLinkHtml = '';
+  Object.keys(property.siteMap).forEach(key => {
+    const siteMap = property.siteMap[key];
+    pageLinkHtml += `<button type="button" class=copy-btn onClick='navigator.clipboard.writeText("${siteMap.link}")'>Copy</button>
+      <a href='${siteMap.link}' onclick="window.open('${siteMap.link}','','width=1920,height=1080'); return false;"> ${siteMap.name}(${siteMap.company_name?.trim()})</a>,`;
+  });
+
+  return `<div style ="border: 1px solid #ddd; border-bottom: none; width: 700px">
+  <h2 id = ${i} class = ${property.isUnwatching ? "unwatching" : ""}>
     <p style="margin: 0;
     padding: 0;
     font-size: 1em;">
-    <p>${property_array[i].address}
-    <button class ="watched" onclick="setFlag(${i})">チェック</button>
-    <button class ="unwatched" onclick="unsetFlag(${i})">未チェック</button>
+    <p>${property.address}
+    <button class ="watched" onclick="setFlag(${i})">非表示化</button>
+    <button class ="unwatched" onclick="unsetFlag(${i})">表示化</button>
     </p>
     </p>
   </h2>
@@ -246,31 +146,33 @@ function makeBuildingLi(property_array) {
       <div style="float: left;
       margin-right: 9px;
         <p class="mainImageRect">
-          <a href="/chuko/ikkodate/fukushima/aizuwakamatsushi/suumof_70599242/" target="_blank" data-pbcd-track-on-click="">
-            <img alt=A src=${property_array[i].build_src} height="300" widtd="170">
-          </a>
+          <img alt=A src=${property.build_src} height="300" widtd="170">
         </p>
+        <p>${getKeyFromProperty(property)}</p>
+        <p>${i}</p>
       </div>
         <table border="1" class="row">
-        <tr><th>価格</th><td>${property_array[i].price}</td></tr>
-        <tr><th>所在地</th><td>${property_array[i].address}</td></tr>
-        <tr><th>交通</th><td>${property_array[i].traffic}</td></tr>
-        <tr><th>土地面積</th><td>${property_array[i].land_area}</td></tr>
-        <tr><th>建物面積</th><td>${property_array[i].build_area}</td></tr>
-        <tr><th>築年月</th><td>${property_array[i].build_date}</td></tr>
-        <tr><th>担当会社</th><td>${property_array[i].company}</td></tr>
-        <tr><th>参照サイト</th><td>
-        `;
-  let str2 = "";
-  for (j = 0; j < property_array[i].site_link.length; j++) {
-    let tmp = `<button type="button" class=copy-btn onClick='navigator.clipboard.writeText("${property_array[i].site_link[j].link}")'>Copy</button><a href='${property_array[i].site_link[j].link}' onclick="window.open('${property_array[i].site_link[j].link}','','width=1920,height=1080'); return false;">
-        ${property_array[i].site_link[j].site}</a>,`;
-    str2 = str2 + tmp;
-  }
-  let str3 = `</td></tr></table></div></div></div>`;
-  let str = str1 + str2 + str3;
-  let div = document.createElement("div");
-  div.innerHTML = str; //html要素に変換
-  getdiv.appendChild(div);
+          <tr><th>価格</th><td>${property.price}</td></tr>
+          <tr><th>所在地</th><td>${property.address}</td></tr>
+          <tr><th>交通</th><td>${property.traffic}</td></tr>
+          <tr><th>土地面積</th><td>${property.land_area}</td></tr>
+          <tr><th>建物面積</th><td>${property.build_area}</td></tr>
+          <tr><th>築年月</th><td>${property.build_date}</td></tr>
+          <tr><th>参照サイト(情報提供会社)</th><td>${pageLinkHtml}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>`;
 }
-func();
+function renderProperties(properties){
+  console.log(properties.length);
+  const ListTags = properties.map((p, i) => {
+    return genPropertyListTag(p, i)
+  })
+  const propertiesDiv = document.getElementById("properties");
+  propertiesDiv.innerHTML = ListTags.join(); //html要素に変換
+}
+
+function getKeyFromProperty(property) {
+  return property.land_area.substr(0, 5) + property.address.substr(0, 10)
+}

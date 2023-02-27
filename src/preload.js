@@ -1,21 +1,20 @@
 const { contextBridge, ipcRenderer, ipcMain } = require("electron");
 
 //隔離ワールド
-contextBridge.exposeInMainWorld("versions", {
+contextBridge.exposeInMainWorld("org", {
   //レンダラーでロードしたページはここでJS実行
   node: () => process.versions.node,
   chrome: () => process.versions.chrome,
   electron: () => process.versions.electron,
-  ping: () => ipcRenderer.invoke("ping"),
   setTitle: (title) => ipcRenderer.send("set-title", title), //タイトルを送る
-  puppeteer: () => ipcRenderer.invoke("automation"),
+  fetchProperties: () => ipcRenderer.invoke("fetchProperties"),
   search: (text) => ipcRenderer.send("search", text),
   stopsearch: () => ipcMain.invoke("stopsearch"),
 });
 // 関数だけでなく、変数も公開できます
 
 //下記の二つアクセスできないのを解決
-//レンダラーーーーAPI
+//レンダラ---API
 //メインプロセス---DOM
 
 //Web->mainプロセス ipcMain.handle,ipcRender.invokeで公開
