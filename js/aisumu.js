@@ -25,8 +25,8 @@ exports.getProperties = async function getProperties(browser) {
       address: await getAdress(bl),
       traffic: await getTraffic(bl),
       price: await getPrice(bl),
-      land_area: await getLand(bl),
-      build_area: "",
+      land_area: await getLandArea(bl),
+      build_area: await getBuildingArea(bl),
       build_date: "",
     };
   }));
@@ -59,10 +59,15 @@ async function getTraffic(buildingLi) {
   let traffic_text = await ( await traffic.getProperty("textContent")).jsonValue();
   return traffic_text.replace(/\s+/g, "");
 }
-async function getLand(buildingLi) {
-  const land_base = await buildingLi.$("table.room-list");
+async function getLandArea(buildingLi) {
+  const land_base = await buildingLi.$("table.room-list > tbody > tr:nth-child(2)");
   const land = await land_base.$('[data-column="menseki"]');
-  return await (await land.getProperty("textContent")).jsonValue();
+  return (await (await land.getProperty("textContent")).jsonValue()).split('/')[0];
+}
+async function getBuildingArea(buildingLi) {
+  const land_base = await buildingLi.$("table.room-list > tbody > tr:nth-child(2)");
+  const land = await land_base.$('[data-column="menseki"]');
+  return (await (await land.getProperty("textContent")).jsonValue()).split('/')[1];
 }
 async function getPrice(buildingLi) {
   const price = await buildingLi.$(

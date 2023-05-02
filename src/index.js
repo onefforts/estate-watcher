@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const electronReload = require('electron-reload')
 
+const fs = require('fs')
 const path = require("path");
 const { default: puppeteer } = require("puppeteer");
 const athome = require("../js/athome.js");
@@ -37,20 +38,21 @@ if (isDev) {
 
 async function fetchProperties() {
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     args: ['--no-sandbox --profile-directory="profile_estate-watcher"'],
     userDataDir: "./profile_estate-watcher"
   });
 
   const properties = (await Promise.all([
       aisumu.getProperties(browser),
-      // athome.getProperties(browser),
+      athome.getProperties(browser),
       hatomark.getProperties(browser),
       housego.getProperties(browser),
       iestation.getProperties(browser),
       nifty.getProperties(browser)
     ])).flat(1);
 
+  browser.close();
   return properties;
 }
 function Search(_event, text) {
@@ -74,6 +76,7 @@ const createWindow = () => {
     height: 1080,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), //(実行中のスクリプトパス,レンダリング前にバージョン公開)非同期でスクリプトをロード
+      contextIsolation: true,
     },
   });
   //(preloadのkey"set-title"からtitle文字列取得,handleSetTitleにipcMainEvent構造体とtitleを送る)
@@ -91,19 +94,26 @@ const createWindow = () => {
     if (result.finalUpdate) {
       result_string = `${active}/${result.matches}`;
     } // M個のマッチ中 N 番目がアクティブな時，N/M という文字列をつくる
+
   });
 
   ////////////////////////////////////////////////////////////////
   //mainWindowにindex.html読み込み
   mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
   mainWindow.webContents.openDevTools();
-
 };
 
 app.whenReady().then(() => {
   ipcMain.handle("fetchProperties", fetchProperties);
   ipcMain.on("search", Search);
   ipcMain.handle("stopsearch", StopSearch);
+  ipcMain.handle('readJson', async filename => {
+    return fs.readFileSync(`./data/${filename}`, { encoding: 'utf8' });
+  });
+  ipcMain.handle('writeJson', async (filename, json) => {
+    fs.writeFileSync(`./data/${filename}`, json);
+  });
+
   createWindow();
   app.on("activate", () => {
     //activateをリッスン(mac用)

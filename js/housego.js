@@ -23,9 +23,9 @@ exports.getProperties= async function getProperties(browser) {
       build_src: await getBuildSrc(bl),
       siteMap: {
         housego: {
-          link: await getLink(page),
+          link: await getLink(bl),
           name: siteName,
-          company_name: await getCompany(bl),
+          company_name: await getCompanyName(bl),
         }
       },
       address: await getAdress(bl),
@@ -79,7 +79,7 @@ async function getTableItem(buildingLi, keynum) {
   
   return await (await element.getProperty("textContent")).jsonValue();
 }
-async function getCompany(buildingLi) {
+async function getCompanyName(buildingLi) {
   const company = await buildingLi.$("tr:nth-child(3) > td");
   
   return await (await company.getProperty("textContent")).jsonValue();

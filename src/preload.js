@@ -3,13 +3,15 @@ const { contextBridge, ipcRenderer, ipcMain } = require("electron");
 //隔離ワールド
 contextBridge.exposeInMainWorld("org", {
   //レンダラーでロードしたページはここでJS実行
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron,
+  node: () => process.org.node,
+  chrome: () => process.org.chrome,
+  electron: () => process.org.electron,
   setTitle: (title) => ipcRenderer.send("set-title", title), //タイトルを送る
   fetchProperties: () => ipcRenderer.invoke("fetchProperties"),
   search: (text) => ipcRenderer.send("search", text),
   stopsearch: () => ipcMain.invoke("stopsearch"),
+  readJson: (filename) => ipcMain.invoke("readJson", filename),
+  writeJson: (filename, json) => ipcMain.invoke("writeJson", filename, json),
 });
 // 関数だけでなく、変数も公開できます
 

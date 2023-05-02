@@ -23,7 +23,7 @@ exports.getProperties = async function getProperties(browser) {
         nifty: {
           link: await getLink(bl),
           name: "ニフティ",
-          company_name: await getCompany(bl),
+          company_name: await getCompanyName(bl),
         }
       },
       address: await getTableItem(bl, 1),
@@ -44,7 +44,7 @@ async function getLink(buildingLi) {
   const detail_link_base = await buildingLi.$(".mainImageRect > a");
   return await (await detail_link_base.getProperty('href')).jsonValue();
 }
-async function getCompany(buildingLi) {
+async function getCompanyName(buildingLi) {
   const company_base = await buildingLi.$(".maker > div > p:nth-child(3)");
   return await ( await company_base.getProperty("textContent")).jsonValue();
 }

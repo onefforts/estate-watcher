@@ -29,7 +29,7 @@ exports.getProperties = async function getProperties(browser) {
         hatomark: {
           link: await getLink(bl),
           name: "ハトマーク",
-          company_name: await getCompany(bl),
+          company_name: await getCompanyName(bl),
         }
       },
       address: await getAdress(bl),
@@ -69,7 +69,7 @@ async function getTableItem(buildingLi, keyword) {
   ).jsonValue();
   return element_text;
 }
-async function getCompany(buildingLi) {
+async function getCompanyName(buildingLi) {
   const company = await buildingLi.$(".text-end");
   return await (await company.getProperty("textContent")).jsonValue();
 }

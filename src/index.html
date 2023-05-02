@@ -3,22 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <title>Building correct App</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css" />
   </head>
 
-  <body>
+  <body class="container">
     <h1>Collect building Item</h1>
-    <p>Welcome to your Electron application.</p>
-    <button id="fetchBtn">更新</button>
-    <button id="watchfilter">チェック済み</button>
-    <button id="unwatchfilter">未チェック</button>
-    <button id="filter500">500万円以下</button>
-    <button id="allshow">全表示</button>
-    <button id="sortAskBtn">昇順並び替え</button>
-    <button id="sortDescBtn">降順並び替え</button>
-    <button id="filter_area">土地のみ</button>
-    <button id="filter_build">建物のみ</button>
-    <div id="properties"></div>
+    <div class="mb-3">
+      <button class="btn btn-outline-primary" id="fetchBtn">更新</button>
+      <button class="btn btn-outline-primary" id="filterWatchingBtn">デフォルト表示</button>
+      <button class="btn btn-outline-primary" id="filterUnwatchingBtn">非表示化分</button>
+      <button class="btn btn-outline-primary" id="filter500">500万円以下</button>
+      <button class="btn btn-outline-primary" id="filterPriceChanged">価格変更有</button>
+      <button class="btn btn-outline-primary" id="showAllBtn">全表示</button>
+      <span>価格:</span>
+      <button class="btn btn-outline-primary" id="sortPriceAscBtn">昇順</button>
+      <button class="btn btn-outline-primary" id="sortPriceDescBtn">降順</button>
+      <span>取得日:</span>
+      <button class="btn btn-outline-primary" id="sortDateAscBtn">昇順</button>
+      <button class="btn btn-outline-primary" id="sortDateDescBtn">降順</button>
+    </div>
+
+    <div>last updated at<p id="last_updated_at"></p></div>
+    <div id="properties" class="container"></div>
+    <a id="go-to-top" class="btn btn-outline-primary" href="#">上に戻る</a>
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
   <script src="./renderer.js"></script>
 </html>
