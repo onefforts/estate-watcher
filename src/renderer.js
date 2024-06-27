@@ -5,8 +5,8 @@ let propertyMap = {}
 window.onbeforeunload = function () {};
 
 window.onload = function () {
-  listProperties = JSON.parse(localStorage.getItem("listProperties")) || [];
   propertyMap = JSON.parse(localStorage.getItem("propertyMap")) || {};
+  listProperties = JSON.parse(localStorage.getItem("listProperties")) || Object.values(propertyMap);
   renderProperties(listProperties);
 };
 function watchfy(key) {
@@ -28,19 +28,38 @@ function unwatchfy(key) {
   }
 }
 
+document.getElementById('ImportFile').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fileContent = JSON.parse(e.target.result);
+            // ここで読み込んだ内容をローカルストレージに保存
+            localStorage.clear();
+            localStorage.setItem("propertyMap", JSON.stringify(fileContent));
+            console.log('File content saved to localStorage');
+        };
+        reader.onerror = function(e) {
+            console.error('Error reading file:', e);
+        };
+        reader.readAsText(file); // テキストファイルとして読み込む
+    } else {
+        console.log('No file selected');
+    }
+});
+
 const fetchBtn = document.getElementById("fetchBtn");
 const filterWatchingBtn = document.getElementById("filterWatchingBtn");
 const filterUnwatchingBtn = document.getElementById("filterUnwatchingBtn");
 const filter500 = document.getElementById("filter500");
 const filterPriceChanged = document.getElementById("filterPriceChanged");
 const showAllBtn = document.getElementById("showAllBtn");
+const showSellingBtn = document.getElementById("showSellingBtn");
+const showSoldOutBtn = document.getElementById("showSoldOutBtn");
 const sortPriceAscBtn = document.getElementById("sortPriceAscBtn");
 const sortPriceDescBtn = document.getElementById("sortPriceDescBtn");
 const sortDateAscBtn = document.getElementById("sortDateAscBtn");
 const sortDateDescBtn = document.getElementById("sortDateDescBtn");
-// IDEA: 価格変更があったものを抽出できるようにする
-// IDEA: TOPポジションへ移動ボタン追加
-// IDEA: 過去取得分一覧表示ボタン追加
 // TOFIX: 全表示時、現在掲載されていないものも表示されている問題修正
 
 fetchBtn.addEventListener("click", async () => {
@@ -58,26 +77,25 @@ fetchBtn.addEventListener("click", async () => {
     const key = getKeyFromProperty(p);
     const date = moment().format("YYYY/MM/DD");
 
-    if(isDebugMode) localStorage.clear();
+    if(isDebugMode) 
 
     if(!propertyMap[key]) {
       propertyMap[key] = p;
       propertyMap[key].firstFetchAt = date;
       propertyMap[key].lastFetchAt = date;
-      propertyMap[key].prices = [p.price];
+      propertyMap[key].priceHistories = [{price: p.price, date: date}];
     } else {
       propertyMap[key].siteMap = {...propertyMap[key].siteMap, ...p.siteMap} 
       propertyMap[key].lastFetchAt = date;
-      propertyMap[key].prices = [...new Set(propertyMap[key].prices.concat(p.price))]
+      propertyMap[key].priceHistories = [...new Set(propertyMap[key].priceHistories.concat({price: p.price, date: date}))]
     }
-
-    propertyMap[key].isListing;
 
     tempListProperties.push(propertyMap[key]);
   })
 
-  listProperties = sortbyFetchDate([...new Set(tempListProperties)], "desc")
-    .filter(p => {
+  console.log(tempListProperties);
+  listProperties = sortbyFetchDate([...new Set(tempListProperties)], "desc").filter(p => {
+    if(!p) return false;
     const key = getKeyFromProperty(p);
     return !propertyMap[key].isUnwatching
   });
@@ -86,7 +104,6 @@ fetchBtn.addEventListener("click", async () => {
 
   console.log(propertyMap);
   localStorage.setItem("propertyMap", JSON.stringify(propertyMap));
-  console.log(listProperties);
   localStorage.setItem("listProperties", JSON.stringify(listProperties));
   fetchBtn.classList.remove("pushbtn");
   const dateP= document.getElementById("last_updated_at");
@@ -109,7 +126,7 @@ filterPriceChanged.addEventListener("click", async () => {
   activateBtn(filterPriceChanged);
   inactivateBtn(showAllBtn);
   listProperties = listProperties.filter(p => {
-    return p.prices.length > 1;
+    return p.priceHistories && (p.priceHistories.length > 1);
   });
 
   renderProperties(listProperties);
@@ -119,8 +136,8 @@ sortPriceAscBtn.addEventListener("click", async () => {
   activateBtn(sortPriceAscBtn);
   inactivateBtn(sortPriceDescBtn);
   listProperties.sort((l1, l2) => {
-    const price1 = parseInt(l1.price.replace("万円", "").replace(",", ""));
-    const price2 = parseInt(l2.price.replace("万円", "").replace(",", ""));
+    const price1 = l1.priceHistories ? parseInt(genPriceInfoStrs(l1.priceHistories).slice(-1)[0].replace("万円", "").replace(",", "")) : l1.price;
+    const price2 = l2.priceHistories ? parseInt(genPriceInfoStrs(l2.priceHistories).slice(-1)[0].replace("万円", "").replace(",", "")) : l2.price;
 
     return price1 - price2;
   });
@@ -132,8 +149,8 @@ sortPriceDescBtn.addEventListener("click", async () => {
   activateBtn(sortPriceDescBtn);
   inactivateBtn(sortPriceAscBtn);
   listProperties.sort((l1, l2) => {
-    const price1 = parseInt(l1.price.replace("万円", "").replace(",", ""));
-    const price2 = parseInt(l2.price.replace("万円", "").replace(",", ""));
+    const price1 = l1.priceHistories ? parseInt(genPriceInfoStrs(l1.priceHistories).slice(-1)[0].replace("万円", "").replace(",", "")) : l1.price;
+    const price2 = l2.priceHistories ? parseInt(genPriceInfoStrs(l2.priceHistories).slice(-1)[0].replace("万円", "").replace(",", "")) : l2.price;
 
     return price2 - price1;
   });
@@ -184,6 +201,27 @@ filterWatchingBtn.addEventListener("click", async () => {
   localStorage.setItem("propertyMap", JSON.stringify(propertyMap));
   renderProperties(listProperties);
 });
+showSellingBtn.addEventListener("click", async () => {
+  activateBtn(showSellingBtn);
+  inactivateBtn(showAllBtn);
+
+  listProperties = listProperties.filter(p => {
+    return new Date(p.lastFetchAt) >= new Date(moment().add(-1, 'day').startOf('day'));
+  });
+
+  renderProperties(listProperties);
+});
+showSoldOutBtn.addEventListener("click", async () => {
+  activateBtn(showSoldOutBtn);
+  inactivateBtn(showAllBtn);
+
+  listProperties = listProperties.filter(p => {
+    console.log(new Date(p.lastFetchAt), new Date(moment().startOf('day')))
+    return new Date(p.lastFetchAt) < new Date(moment().startOf('day'));
+  });
+
+  renderProperties(listProperties);
+});
 showAllBtn.addEventListener("click", async () => {
   console.log("全表示ボタンがクリックされました");
   activateBtn(showAllBtn);
@@ -191,10 +229,10 @@ showAllBtn.addEventListener("click", async () => {
   inactivateBtn(filterUnwatchingBtn);
   inactivateBtn(filter500);
   inactivateBtn(filterPriceChanged);
+  inactivateBtn(showSellingBtn);
+  inactivateBtn(showSoldOutBtn);
 
-  listProperties = Object.keys(propertyMap).map(k => {
-    return propertyMap[k];
-  });
+  listProperties = Object.values(propertyMap);
   renderProperties(listProperties);
 });
 
@@ -207,6 +245,7 @@ function genPropertyListTag(property, i) {
       <a href='${siteMap.link}' onclick="window.open('${siteMap.link}','','width=1920,height=1080'); return false;"> ${siteMap.name}(${siteMap.company_name?.trim()})</a>,`;
   });
 
+  const priceHistories = genPriceInfoStrs(property.priceHistories);
   return `<div id="${key}" class="card mb-3 ${property.isUnwatching ? "unwatching" : "watching"}">
     <div class="itemBody">
       <div>
@@ -226,7 +265,7 @@ function genPropertyListTag(property, i) {
         </h3>
         <table class="table table-bordered">
           <tr><th>最新取得日</th><td>${property.lastFetchAt}</td><th>初取得日</th><td>${property.firstFetchAt}</td></tr>
-          <tr><th>価格</th><td>${property.price}</td><th>履歴</th><td>${property.prices?.join(' -> ')}</td></tr>
+          <tr><th>価格</th><td>${property.priceHistories ? priceHistories.slice(-1)[0] : property.price}</td><th>履歴</th><td>${priceHistories?.join(' -> ')}</td></tr>
           <tr><th>所在地</th><td colspan="3">${property.address}</td></tr>
           <tr><th>交通</th><td colspan="3">${property.traffic}</td></tr>
           <tr><th>土地面積</th><td colspan="3">${property.land_area}</td></tr>
@@ -255,6 +294,11 @@ function sortbyFetchDate(properties, orderby="asc"){
     if(orderby=="asc") return new Date(l1.firstFetchAt) - new Date(l2.firstFetchAt);
     else return new Date(l2.firstFetchAt) - new Date(l1.firstFetchAt);
   });
+}
+function genPriceInfoStrs(priceHistories) {
+  return priceHistories ? priceHistories.map((ph, i) => {
+    return ph.price ? `${ph.price}(${ph.date})` : ph;
+  }) : [];
 }
 function activateBtn(btn) {
   btn.classList.remove('btn-outline-primary');

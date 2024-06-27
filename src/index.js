@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, session } = require("electron");
 const electronReload = require('electron-reload')
 
 const fs = require('fs')
@@ -99,7 +99,7 @@ const createWindow = () => {
 
   ////////////////////////////////////////////////////////////////
   //mainWindowにindex.html読み込み
-  mainWindow.webContents.setWindowOpenHandler(); //Developerツールを開いてサイトを開く
+  mainWindow.webcontents.setwindowOpenHandler(); //Developerツールを開いてサイトを開く
   mainWindow.webContents.openDevTools();
 };
 

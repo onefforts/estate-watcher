@@ -1,14 +1,17 @@
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-const siteName = 'ハトマーク';
+const siteName = 'hatomark';
 exports.getProperties = async function getProperties(browser) {
   const page = await browser.newPage();
 
+  // UAのバージョンが新しくないと表示されない
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36');
   await page.goto(
     "https://www.hatomarksite.com/search/zentaku/buy/house/area/07/list?m_adr%5B%5d=07202&m_adr%5B%5d=07203&m_adr%5B%5d=07208&m_adr%5B%5d=07408&m_adr%5B%5d=07421&page=1",
     {
       waitUntil: ["networkidle0"],
     }
   );
+  await page.waitForSelector('select[name="price_b_to"]');
   await page.select('select[name="price_b_to"]', "10000000");
   const search_button = await getElements(
     'button[type="submit"',
@@ -16,10 +19,9 @@ exports.getProperties = async function getProperties(browser) {
     page
   );
   search_button.click();
-  await sleep(3000);
+  await page.waitForSelector("select[name='limit']");
   await page.select('select[name="limit"]', "100");
-  await sleep(5000); // リスト描画待機
-
+  await page.waitForSelector(".list-table > .col-12");
   const buildingLies = await page.$$(".list-table > .col-12"); //偶数でカード
   console.log(siteName, buildingLies.length);
   return await Promise.all(buildingLies.map(async bl => {

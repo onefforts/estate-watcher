@@ -1,4 +1,4 @@
-const siteName = 'あいすむ';
+const siteName = 'aisumu';
 
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -9,7 +9,7 @@ exports.getProperties = async function getProperties(browser) {
     "https://ai-sumu.com/buy/house/area/fukushimaken/search/list?shozaichi%5B%5D=07202&shozaichi%5B%5D=07208&shozaichi%5B%5D=07421&price_from=&price_to=10000000&last_upd_datetime=&walk_time=&taten_menseki_from=&taten_menseki_to=&tochi_menseki_from=&tochi_menseki_to=&chiku_year=&freeword=",
     { waitUntil: ["networkidle2"], }
   );
-  await sleep(1000);
+  await page.waitForSelector(".property-list-one > li");
   const buildingLi = await page.$$(".property-list-one > li");
   console.log(siteName, buildingLi.length);
   return await Promise.all(buildingLi.map(async bl => {

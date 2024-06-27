@@ -11,10 +11,10 @@ exports.getProperties= async function getProperties(browser) {
     }
   );
 
-  await sleep(3000);
+  await page.waitForSelector('select[name="ps"]');
   await page.select('select[name="ps"]', "80");
-  await sleep(5000);
 
+  await page.waitForSelector(".rent_tabel_box > table.property > tbody");
   const buildingLies = await page.$$(".rent_tabel_box > table.property > tbody");
 
   console.log(siteName, buildingLies.length);

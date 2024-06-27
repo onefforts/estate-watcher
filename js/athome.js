@@ -4,18 +4,26 @@ const siteName = 'athome';
 exports.getProperties = async function getProperties(browser) {
   const page = await browser.newPage();
 
-  await page.screenshot({ path: "screenshot2_1.png", fullPage: true });
+  // UAのバージョンが新しくないと認証を求められる
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36');
   await page.goto(
     "https://www.athome.co.jp/kodate/chuko/fukushima/aizuwakamatsu-city/list/page1/?RND_TIME_PRM=24254&RND_MODE=1",
     {
-      waitUntil: ["networkidle0"],
+      waitUntil: ["domcontentloaded"],
     }
   );
-  //////////////////認証エラー
-  await page.screenshot({ path: "screenshot2_2.png", fullPage: true });
-  await sleep(10000);
-  await page.select('select[name="PRICETO"]', "kp102");
-  const buildingLies = await page.$$("#item-list > .object");
+
+  let buildingLies = []; 
+  try{
+    await page.waitForSelector('select.dev-postItemData[name="PRICETO"]', {timeout: 60000});
+    await page.select('select.dev-postItemData[name="PRICETO"]', "kp102");
+
+    await page.waitForSelector("#item-list > .list-font-change > .object", {timeout: 60000});
+    buildingLies = await page.$$("#item-list > .list-font-change > .object");
+  }catch(e){
+    console.error(`error occured while processing in browser: ${e}`);
+    await page.screenshot({ path: "./temp.png"});
+  }
 
   console.log(siteName, buildingLies.length);
   return await Promise.all(buildingLies.map(async (bl, i) => {

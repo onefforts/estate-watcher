@@ -1,37 +1,44 @@
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-const siteName = "イエステーション"
+const siteName = "iestation"
 
 exports.getProperties = async function getProperties(browser) {
   const page = await browser.newPage();
 
   await page.goto(
-    "http://www.address-kaitai.com/buy/ikkodate/area/sc_07202/?kt=10000000",
+    // "http://www.address-kaitai.com/buy/ikkodate/area/sc_07202/?kt=10000000",
+    "http://www.address-kaitai.com/buy/ikkodate/search/?sc=07201&sc=07202&sc=07203&sc=07208",
     {
       waitUntil: ["networkidle0"],
+      timeout: 60000
     }
   );
-  await sleep(5000);
+  await page.waitForSelector(".krList", 60000);
   const buildingLies = await page.$$(".krList");
 
   console.log(siteName, buildingLies.length);
-  return await Promise.all(buildingLies.map(async bl => {
-    return {
-      build_src: await getBuildSrc(bl),
-      address: await getAddress(bl),
-      traffic: await getTraffic(bl),
-      price: await getPrice(bl),
-      land_area: await getLandarea(bl),
-      build_area: await getBuildarea(bl),
-      build_date: await getDate(bl),
-      siteMap: {
-        iestation: {
-          link: await getLink(bl),
-          name: siteName,
-          company_name: siteName
-        }
-      },
-    };
-  }));
+  try {
+    return await Promise.all(buildingLies.map(async bl => {
+      return {
+        build_src: await getBuildSrc(bl),
+        address: await getAddress(bl),
+        traffic: await getTraffic(bl),
+        price: await getPrice(bl),
+        land_area: await getLandarea(bl),
+        build_area: await getBuildarea(bl),
+        build_date: await getDate(bl),
+        siteMap: {
+          iestation: {
+            link: await getLink(bl),
+            name: siteName,
+            company_name: siteName
+          }
+        },
+      };
+    }));
+  }catch(e){
+    console.log(e);
+    return [];
+  }
 };
 
 async function getBuildSrc(buildingLi) {
@@ -73,6 +80,8 @@ async function getBuildarea(buildingLi) {
   const build_area = await buildingLi.$(
     ".spec > div:nth-child(4) > table > tbody > tr > td:nth-child(1) > dl > dd"
   );
+
+  if(!build_area) return '';
   let build_area_text = await (
     await build_area.getProperty("textContent")
   ).jsonValue();
@@ -83,7 +92,8 @@ async function getDate(buildingLi) {
   const date = await buildingLi.$(
     ".spec > div:nth-child(4) > table > tbody > tr > td:nth-child(2) > dl > dd"
   );
+  if(!date) return '';
   let date_text = await (await date.getProperty("textContent")).jsonValue();
-  date_text = date_text.replace(/\s+/g, "");
+  date_text = date_text.replace(/j\s+/g, "");
   return date_text;
 }

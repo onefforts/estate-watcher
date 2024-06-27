@@ -6,7 +6,6 @@ contextBridge.exposeInMainWorld("org", {
   node: () => process.org.node,
   chrome: () => process.org.chrome,
   electron: () => process.org.electron,
-  setTitle: (title) => ipcRenderer.send("set-title", title), //タイトルを送る
   fetchProperties: () => ipcRenderer.invoke("fetchProperties"),
   search: (text) => ipcRenderer.send("search", text),
   stopsearch: () => ipcMain.invoke("stopsearch"),
